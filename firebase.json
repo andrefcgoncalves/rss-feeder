@@ -26,10 +26,6 @@
       {
         "source": "/share-target",
         "destination": "/share-target.html"
-      },
-      {
-        "source": "/api/ingest",
-        "function": "ingestUrl"
       }
     ],
     "headers": [

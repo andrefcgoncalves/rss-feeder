@@ -95,9 +95,7 @@
 
     <script>
         // Configuration constants
-        const API_ENDPOINTS = {
-            INGEST: '/api/ingest'
-        };
+        const API_ENDPOINT = 'https://ingesturl-bnedqqqzpa-uc.a.run.app';
 
         // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
@@ -126,11 +124,19 @@
             try {
                 title.textContent = 'Adding to SmartFeed...';
                 
-                // This will be proxied to the Cloud Function via Firebase Hosting rewrite
-                const response = await fetch(API_ENDPOINTS.INGEST, {
+                // Get API token from localStorage
+                const apiToken = localStorage.getItem('smartfeed_api_token');
+                if (!apiToken) {
+                    showError('❌ Please configure your API token first. Go to the main page to set it up.');
+                    return;
+                }
+                
+                // Call the SmartFeed API directly
+                const response = await fetch(API_ENDPOINT, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiToken}`
                     },
                     body: JSON.stringify({ url })
                 });

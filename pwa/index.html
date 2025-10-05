@@ -218,6 +218,25 @@
             </ol>
         </div>
         
+        <div class="install-card">
+            <h2>⚙️ Configure API Token</h2>
+            <p>Enter your SmartFeed API token to enable sharing functionality.</p>
+            
+            <div style="margin: 20px 0;">
+                <input type="password" id="apiTokenInput" placeholder="Enter your API token" 
+                       style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; margin-bottom: 10px;">
+                <button class="install-button" id="saveTokenButton" style="margin: 0;">
+                    💾 Save Token
+                </button>
+            </div>
+            
+            <div id="tokenStatus" class="status" style="display: none;"></div>
+            
+            <p style="font-size: 14px; color: #666; margin-top: 15px;">
+                <strong>Need a token?</strong> Contact your SmartFeed administrator to get your API token.
+            </p>
+        </div>
+        
         <div class="features">
             <div class="feature">
                 <div class="feature-icon">🤖</div>
@@ -245,6 +264,9 @@
         let deferredPrompt;
         const installButton = document.getElementById('installButton');
         const statusMessage = document.getElementById('statusMessage');
+        const apiTokenInput = document.getElementById('apiTokenInput');
+        const saveTokenButton = document.getElementById('saveTokenButton');
+        const tokenStatus = document.getElementById('tokenStatus');
         
         // Check if PWA is already installed
         if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
@@ -288,10 +310,44 @@
             installButton.disabled = true;
         });
         
+        // Load existing API token
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedToken = localStorage.getItem('smartfeed_api_token');
+            if (savedToken) {
+                apiTokenInput.value = savedToken;
+                showTokenStatus('✅ API token is configured', 'success');
+            }
+        });
+        
+        // Handle token save
+        saveTokenButton.addEventListener('click', () => {
+            const token = apiTokenInput.value.trim();
+            if (!token) {
+                showTokenStatus('❌ Please enter an API token', 'error');
+                return;
+            }
+            
+            localStorage.setItem('smartfeed_api_token', token);
+            showTokenStatus('✅ API token saved successfully!', 'success');
+        });
+        
         function showStatus(message, type) {
             statusMessage.textContent = message;
             statusMessage.className = `status ${type}`;
             statusMessage.style.display = 'block';
+        }
+        
+        function showTokenStatus(message, type) {
+            tokenStatus.textContent = message;
+            tokenStatus.className = `status ${type}`;
+            tokenStatus.style.display = 'block';
+            
+            // Auto-hide success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    tokenStatus.style.display = 'none';
+                }, 3000);
+            }
         }
         
         // Register service worker

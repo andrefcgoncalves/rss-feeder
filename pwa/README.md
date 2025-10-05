@@ -7,7 +7,7 @@ The PWA component enables mobile users to share content to SmartFeed directly fr
 ## Architecture
 
 ```
-Mobile App Share → System Share Sheet → SmartFeed PWA → Firebase Hosting → Cloud Function
+Mobile App Share → System Share Sheet → SmartFeed PWA → SmartFeed API Endpoint
 ```
 
 ## Files Structure
@@ -23,8 +23,9 @@ pwa/
 
 ## How It Works
 
-### 1. PWA Installation
+### 1. PWA Installation & Configuration
 - User visits the hosted PWA page
+- User configures their API token in the settings
 - Browser prompts to "Add to Home Screen"
 - PWA is installed and appears in device's app drawer
 - Share target becomes available in system share sheet
@@ -34,12 +35,12 @@ pwa/
 - Taps the system share button
 - Selects "SmartFeed" from share options
 - Content URL is sent to share-target.html
-- Page processes the URL via Cloud Function
+- Page processes the URL via direct API call to SmartFeed endpoint
 - User gets immediate feedback
 
 ### 3. URL Processing Flow
 ```
-share-target.html → /api/ingest → Cloud Function → Gemini API → Firestore → RSS Generation
+share-target.html → SmartFeed API Endpoint → Gemini API → Firestore → RSS Generation
 ```
 
 ## Configuration
