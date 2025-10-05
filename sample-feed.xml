@@ -1,0 +1,37 @@
+# Test RSS feed XML
+# This file can be used to test RSS reader compatibility
+
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Gemini RSS Feed</title>
+    <description>AI-powered RSS feed generated using Gemini API</description>
+    <link>https://storage.googleapis.com/test-project.appspot.com</link>
+    <lastBuildDate>Sat, 05 Oct 2024 12:00:00 GMT</lastBuildDate>
+    <pubDate>Sat, 05 Oct 2024 12:00:00 GMT</pubDate>
+    <ttl>60</ttl>
+    <language>en</language>
+    <managingEditor>rss@example.com</managingEditor>
+    <webMaster>webmaster@example.com</webMaster>
+    <category>Technology</category>
+    <category>AI</category>
+    <category>RSS</category>
+    
+    <item>
+      <title>Sample Article: Understanding AI-Generated Content</title>
+      <description>This is an example of how the Gemini API intelligently summarizes content, providing concise and relevant descriptions for RSS feeds.</description>
+      <link>https://example.com/ai-content-article</link>
+      <guid>sample-guid-123</guid>
+      <pubDate>Sat, 05 Oct 2024 12:00:00 GMT</pubDate>
+    </item>
+    
+    <item>
+      <title>Another Example: Serverless Architecture Benefits</title>
+      <description>Demonstrates how serverless functions can create cost-effective, scalable solutions for content aggregation and RSS feed generation.</description>
+      <link>https://example.com/serverless-article</link>
+      <guid>sample-guid-456</guid>
+      <pubDate>Fri, 04 Oct 2024 15:30:00 GMT</pubDate>
+    </item>
+    
+  </channel>
+</rss>
