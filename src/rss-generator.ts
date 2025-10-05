@@ -15,8 +15,8 @@ export class RSSGenerator {
       description: "AI-powered RSS feed generated using Gemini API",
       feed_url: "", // Will be set dynamically
       site_url: "", // Will be set dynamically
-      managingEditor: "rss@example.com",
-      webMaster: "webmaster@example.com",
+      managingEditor: process.env.RSS_MANAGING_EDITOR || "rss@example.com",
+      webMaster: process.env.RSS_WEBMASTER || "webmaster@example.com",
       copyright: `${new Date().getFullYear()} Gemini RSS Generator`,
       language: "en",
       categories: ["Technology", "AI", "RSS"],

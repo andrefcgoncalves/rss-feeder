@@ -123,7 +123,7 @@ URL to analyze: ${url}
    */
   private extractFallbackTitle(url: string, text: string): string {
     // Try to find title-like content in the response
-    const titlePattern = /title["\s:]+([^"\\n]+)/i;
+    const titlePattern = /title["\s:]+([^"\n]+)/i;
     const match = text.match(titlePattern);
     
     if (match && match[1]) {
@@ -138,7 +138,7 @@ URL to analyze: ${url}
    */
   private extractFallbackDescription(text: string): string {
     // Try to find description-like content
-    const descPattern = /description["\s:]+([^"\\n]+)/i;
+    const descPattern = /description["\s:]+([^"\n]+)/i;
     const match = text.match(descPattern);
     
     if (match && match[1]) {

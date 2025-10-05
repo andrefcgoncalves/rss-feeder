@@ -2,6 +2,7 @@ import {onRequest} from "firebase-functions/v2/https";
 import {defineSecret} from "firebase-functions/params";
 import {logger} from "firebase-functions";
 import {Timestamp} from "firebase-admin/firestore";
+import {Request} from "firebase-functions/v2/https";
 import {db, storage, FEED_ITEMS_COLLECTION} from "./firebase";
 import {GeminiService, geminiApiKey} from "./gemini-service";
 import {RSSGenerator} from "./rss-generator";
@@ -13,7 +14,7 @@ const apiToken = defineSecret("API_TOKEN");
 /**
  * Validates the request authorization
  */
-function validateAuth(request: any): boolean {
+function validateAuth(request: Request): boolean {
   // Check if this is a request from our own PWA (via Firebase Hosting rewrite)
   const referer = request.get("Referer");
   const userAgent = request.get("User-Agent");
