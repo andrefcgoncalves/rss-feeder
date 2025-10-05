@@ -7,10 +7,12 @@ document.addEventListener('DOMContentLoaded', async function() {
   const configBtn = document.getElementById('configBtn');
   const configForm = document.getElementById('configForm');
   const statusDiv = document.getElementById('status');
-  const apiEndpointInput = document.getElementById('apiEndpoint');
   const apiTokenInput = document.getElementById('apiToken');
   const saveConfigBtn = document.getElementById('saveConfig');
   const cancelConfigBtn = document.getElementById('cancelConfig');
+
+  // SmartFeed API configuration
+  const API_ENDPOINT = 'https://ingesturl-bnedqqqzpa-uc.a.run.app';
 
   let currentTab = null;
   let isConfigMode = false;
@@ -40,17 +42,12 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   // Load existing configuration
   try {
-    const config = await chrome.storage.sync.get(['apiEndpoint', 'apiToken']);
-    if (config.apiEndpoint) {
-      apiEndpointInput.value = config.apiEndpoint;
-    }
+    const config = await chrome.storage.sync.get(['apiToken']);
     if (config.apiToken) {
       apiTokenInput.value = config.apiToken;
-    }
-
-    // Check if configuration is complete
-    if (!config.apiEndpoint || !config.apiToken) {
-      showStatus('Please configure your API settings first', 'error');
+      shareBtn.disabled = false;
+    } else {
+      showStatus('Please configure your API token first', 'error');
       shareBtn.disabled = true;
     }
   } catch (error) {
@@ -64,13 +61,24 @@ document.addEventListener('DOMContentLoaded', async function() {
       return;
     }
 
+    // Check if API token is configured
+    const config = await chrome.storage.sync.get(['apiToken']);
+    if (!config.apiToken) {
+      showStatus('Please configure your API token first', 'error');
+      toggleConfigMode();
+      return;
+    }
+
     setLoading(true);
     showStatus('Adding page to SmartFeed...', 'loading');
 
     try {
       // Send message to background script
       const response = await chrome.runtime.sendMessage({
-        action: 'shareCurrentTab'
+        action: 'shareUrl',
+        url: currentTab.url,
+        apiEndpoint: API_ENDPOINT,
+        apiToken: config.apiToken
       });
 
       setLoading(false);
@@ -91,26 +99,22 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
   });
 
-  // Configuration button handlers
+  // Configuration button click handler
   configBtn.addEventListener('click', function() {
     toggleConfigMode();
   });
 
+  // Save configuration button click handler
   saveConfigBtn.addEventListener('click', async function() {
-    const endpoint = apiEndpointInput.value.trim();
-    const token = apiTokenInput.value.trim();
-
-    if (!endpoint || !token) {
-      showStatus('Please fill in all configuration fields', 'error');
+    const apiToken = apiTokenInput.value.trim();
+    
+    if (!apiToken) {
+      showStatus('Please fill in the API token', 'error');
       return;
     }
 
     try {
-      await chrome.storage.sync.set({
-        apiEndpoint: endpoint,
-        apiToken: token
-      });
-
+      await chrome.storage.sync.set({ apiToken: apiToken });
       showStatus('✅ Configuration saved successfully', 'success');
       shareBtn.disabled = false;
       toggleConfigMode();
@@ -119,37 +123,40 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
   });
 
+  // Cancel configuration button click handler
   cancelConfigBtn.addEventListener('click', function() {
     toggleConfigMode();
   });
 
   // Helper functions
+  function toggleConfigMode() {
+    isConfigMode = !isConfigMode;
+    configForm.style.display = isConfigMode ? 'block' : 'none';
+    configBtn.textContent = isConfigMode ? '❌ Cancel' : '⚙️ Settings';
+  }
+
   function setLoading(loading) {
-    shareBtn.disabled = loading;
-    spinner.style.display = loading ? 'inline-block' : 'none';
-    shareText.textContent = loading ? 'Sharing...' : 'Share This Page';
+    if (loading) {
+      spinner.style.display = 'inline-block';
+      shareText.textContent = 'Sharing...';
+      shareBtn.disabled = true;
+    } else {
+      spinner.style.display = 'none';
+      shareText.textContent = 'Share This Page';
+      shareBtn.disabled = false;
+    }
   }
 
   function showStatus(message, type) {
     statusDiv.textContent = message;
     statusDiv.className = `status ${type}`;
     statusDiv.style.display = 'block';
-
-    // Auto-hide success messages after 3 seconds
+    
+    // Auto-hide success messages after 5 seconds
     if (type === 'success') {
       setTimeout(() => {
         statusDiv.style.display = 'none';
-      }, 3000);
-    }
-  }
-
-  function toggleConfigMode() {
-    isConfigMode = !isConfigMode;
-    configForm.style.display = isConfigMode ? 'block' : 'none';
-    configBtn.textContent = isConfigMode ? '📰 Back to Share' : '⚙️ Settings';
-    
-    if (isConfigMode) {
-      statusDiv.style.display = 'none';
+      }, 5000);
     }
   }
 });

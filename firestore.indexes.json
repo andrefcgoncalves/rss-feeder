@@ -1,15 +1,4 @@
 {
-  "indexes": [
-    {
-      "collectionGroup": "feed_items",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "pubDate",
-          "order": "DESCENDING"
-        }
-      ]
-    }
-  ],
+  "indexes": [],
   "fieldOverrides": []
 }

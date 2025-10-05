@@ -124,7 +124,7 @@ export const ingestUrl = onRequest(
       // Step 3: Generate RSS feed
       const feedItemsQuery = await feedItemsRef
         .orderBy("pubDate", "desc")
-        .limit(25)
+        .limit(100)
         .get();
 
       const feedItems: FeedItem[] = feedItemsQuery.docs.map((doc) => ({

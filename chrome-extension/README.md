@@ -5,8 +5,8 @@ A Chrome browser extension that allows users to easily share the current webpage
 ## Features
 
 - 🖱️ One-click sharing from any webpage
-- 🔒 Secure API token storage
-- ⚙️ Easy configuration interface
+- 🔒 Pre-configured with SmartFeed endpoint
+- ⚙️ Simple API token configuration
 - ✅ Visual feedback for successful/failed shares
 - 🚫 Automatic filtering of non-shareable pages
 
@@ -17,66 +17,55 @@ A Chrome browser extension that allows users to easily share the current webpage
 1. Open Chrome and navigate to `chrome://extensions/`
 2. Enable "Developer mode" in the top right
 3. Click "Load unpacked" and select the `chrome-extension` folder
-4. The extension icon should appear in your toolbar
+4. The SmartFeed extension icon should appear in your toolbar
 
-### For Production Distribution
+### Configure API Token
 
-1. Zip the entire `chrome-extension` folder
-2. Upload to [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole/)
-3. Follow Chrome Web Store review process
-
-## Configuration
-
-Before using the extension, you need to configure it with your SmartFeed service details:
-
-1. Click the extension icon in your toolbar
+1. Click the SmartFeed extension icon in your toolbar
 2. Click "⚙️ Settings"
-3. Enter your API endpoint URL (from Firebase deployment)
-4. Enter your secure API token
-5. Click "Save Settings"
-
-### Configuration Values
-
-- **API Endpoint URL**: Your deployed Cloud Function URL
-  - Example: `https://us-central1-your-project.cloudfunctions.net/ingestUrl`
-- **API Token**: The secure token you set in Firebase Secret Manager
-  - This should match the `API_TOKEN` secret in your Firebase project
+3. Enter your API token (the one you set in Firebase secrets)
+4. Click "Save Settings"
 
 ## Usage
 
 1. Navigate to any webpage you want to add to your RSS feed
-2. Click the extension icon
-3. Review the current page URL
-4. Click "Share This Page"
-5. Wait for confirmation message
+2. Click the SmartFeed extension icon in your toolbar
+3. Click "Share This Page"
+4. The extension will send the URL to your SmartFeed service
+5. You'll see a success message when the page is added to your feed
+
+## Configuration
+
+The extension is pre-configured with your SmartFeed endpoint:
+- **Endpoint**: `https://ingesturl-bnedqqqzpa-uc.a.run.app` (hardcoded)
+- **API Token**: User-configurable (stored securely in Chrome storage)
 
 ## Security
 
-- API tokens are stored using Chrome's secure storage API
+- API tokens are stored securely using Chrome's storage API
 - Only HTTPS endpoints are supported
 - No data is transmitted to third parties
 - Extension only requests minimal permissions (activeTab, storage)
 
 ## Permissions
 
-The extension requires these minimal permissions:
-
+The extension requires minimal permissions:
 - **activeTab**: To read the URL of the current tab when you click the extension
-- **storage**: To securely store your API configuration locally
+- **storage**: To securely store your API token locally
 
 ## Troubleshooting
-
-### "Please configure your API settings first"
-- Make sure you've entered both the API endpoint URL and token in Settings
 
 ### "Cannot share this type of page"
 - The extension can only share HTTP/HTTPS webpages
 - Chrome internal pages (chrome://) and browser settings cannot be shared
 
+### "Please configure your API token first"
+- Make sure you've entered your API token in Settings
+- The token should match the one you set in Firebase secrets
+
 ### "Network error" or "Failed to add page"
-- Check that your API endpoint URL is correct
-- Verify your API token is valid
-- Ensure your Firebase Cloud Function is deployed and accessible
+- Check that your Firebase Cloud Function is deployed and accessible
+- Verify your API token is correct
 
 ### Extension icon doesn't appear
 - Check that you've loaded the extension properly in Developer mode
@@ -104,3 +93,11 @@ chrome-extension/
     ├── icon-48.png
     └── icon-128.png
 ```
+
+## Production Distribution
+
+For production distribution:
+
+1. Zip the entire `chrome-extension` folder
+2. Upload to [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole/)
+3. Follow Chrome Web Store review process

@@ -92,7 +92,7 @@
         <div id="statusMessage" class="status" style="display: none;"></div>
         <a href="/" class="back-button" id="backButton" style="display: none;">← Back to Home</a>
     </div>
-    
+
     <script>
         // Configuration constants
         const API_ENDPOINTS = {
@@ -121,7 +121,7 @@
         } else {
             showError('No URL was shared. Please try again.');
         }
-        
+
         async function processSharedUrl(url) {
             try {
                 title.textContent = 'Adding to SmartFeed...';

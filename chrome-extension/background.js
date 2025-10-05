@@ -5,48 +5,36 @@ chrome.runtime.onInstalled.addListener(() => {
 
 // Handle messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === 'shareCurrentTab') {
-    handleShareCurrentTab(sendResponse);
+  if (request.action === 'shareUrl') {
+    handleShareUrl(request, sendResponse);
     return true; // Will respond asynchronously
   }
 });
 
-async function handleShareCurrentTab(sendResponse) {
+async function handleShareUrl(request, sendResponse) {
   try {
-    // Get the current active tab
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    const { url, apiEndpoint, apiToken } = request;
     
-    if (!tab || !tab.url) {
-      sendResponse({ success: false, error: 'No active tab found' });
+    if (!url) {
+      sendResponse({ success: false, error: 'No URL provided' });
       return;
     }
 
     // Skip non-http(s) URLs
-    if (!tab.url.startsWith('http://') && !tab.url.startsWith('https://')) {
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
       sendResponse({ success: false, error: 'Cannot share this type of page' });
       return;
     }
 
-    // Get stored configuration
-    const config = await chrome.storage.sync.get(['apiEndpoint', 'apiToken']);
-    
-    if (!config.apiEndpoint || !config.apiToken) {
-      sendResponse({ 
-        success: false, 
-        error: 'Please configure the extension settings first' 
-      });
-      return;
-    }
-
-    // Make API call to the RSS ingestion endpoint
-    const response = await fetch(config.apiEndpoint, {
+    // Make API call to the SmartFeed ingestion endpoint
+    const response = await fetch(apiEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${config.apiToken}`
+        'Authorization': `Bearer ${apiToken}`
       },
       body: JSON.stringify({
-        url: tab.url
+        url: url
       })
     });
 
@@ -61,12 +49,12 @@ async function handleShareCurrentTab(sendResponse) {
     } else {
       sendResponse({ 
         success: false, 
-        error: result.message || 'Failed to add page to RSS feed' 
+        error: result.message || 'Failed to add page to SmartFeed' 
       });
     }
 
   } catch (error) {
-    console.error('Error sharing tab:', error);
+    console.error('Error sharing URL:', error);
     sendResponse({ 
       success: false, 
       error: `Network error: ${error.message}` 
