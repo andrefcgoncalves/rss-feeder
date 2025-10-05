@@ -21,24 +21,24 @@ mkdir -p pwa/icons
 echo "📱 Processing Chrome Extension icons..."
 
 # Chrome Extension icons (square logo, remove white background)
-convert logos/logo_square_with_background.png -transparent white -resize 16x16 chrome-extension/icons/icon-16.png
-convert logos/logo_square_with_background.png -transparent white -resize 32x32 chrome-extension/icons/icon-32.png
-convert logos/logo_square_with_background.png -transparent white -resize 48x48 chrome-extension/icons/icon-48.png
-convert logos/logo_square_with_background.png -transparent white -resize 128x128 chrome-extension/icons/icon-128.png
+convert logos/logo_square_with_background.png -resize 16x16 chrome-extension/icons/icon-16.png
+convert logos/logo_square_with_background.png -resize 32x32 chrome-extension/icons/icon-32.png
+convert logos/logo_square_with_background.png -resize 48x48 chrome-extension/icons/icon-48.png
+convert logos/logo_square_with_background.png -resize 128x128 chrome-extension/icons/icon-128.png
 
 echo "🌐 Processing PWA icons..."
 
 # PWA icons (square logo, remove white background)
-convert logos/logo_square_with_background.png -transparent white -resize 16x16 pwa/icons/icon-16.png
-convert logos/logo_square_with_background.png -transparent white -resize 32x32 pwa/icons/icon-32.png
-convert logos/logo_square_with_background.png -transparent white -resize 72x72 pwa/icons/icon-72.png
-convert logos/logo_square_with_background.png -transparent white -resize 96x96 pwa/icons/icon-96.png
-convert logos/logo_square_with_background.png -transparent white -resize 128x128 pwa/icons/icon-128.png
-convert logos/logo_square_with_background.png -transparent white -resize 144x144 pwa/icons/icon-144.png
-convert logos/logo_square_with_background.png -transparent white -resize 152x152 pwa/icons/icon-152.png
-convert logos/logo_square_with_background.png -transparent white -resize 192x192 pwa/icons/icon-192.png
-convert logos/logo_square_with_background.png -transparent white -resize 384x384 pwa/icons/icon-384.png
-convert logos/logo_square_with_background.png -transparent white -resize 512x512 pwa/icons/icon-512.png
+convert logos/logo_square_with_background.png -resize 16x16 pwa/icons/icon-16.png
+convert logos/logo_square_with_background.png -resize 32x32 pwa/icons/icon-32.png
+convert logos/logo_square_with_background.png -resize 72x72 pwa/icons/icon-72.png
+convert logos/logo_square_with_background.png -resize 96x96 pwa/icons/icon-96.png
+convert logos/logo_square_with_background.png -resize 128x128 pwa/icons/icon-128.png
+convert logos/logo_square_with_background.png -resize 144x144 pwa/icons/icon-144.png
+convert logos/logo_square_with_background.png -resize 152x152 pwa/icons/icon-152.png
+convert logos/logo_square_with_background.png -resize 192x192 pwa/icons/icon-192.png
+convert logos/logo_square_with_background.png -resize 384x384 pwa/icons/icon-384.png
+convert logos/logo_square_with_background.png -resize 512x512 pwa/icons/icon-512.png
 
 echo "✅ Logo processing complete!"
 echo ""
