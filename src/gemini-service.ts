@@ -37,7 +37,7 @@ Please analyze the content at this URL and provide a JSON response with the foll
 }
 
 Requirements:
-- The title should be informative and engaging, not just the HTML title tag
+- The title should be the HTML title tag, or any other that that seem it's the actual article title, if available. If not create an informative and engaging title
 - The description should be a concise summary that captures the essence of the content
 - Keep the description under 160 characters for RSS compatibility
 - Return ONLY the JSON object, no additional text or formatting
