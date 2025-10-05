@@ -14,14 +14,14 @@ export class RSSGenerator {
       title: "SmartFeed",
       description: "AI-powered RSS feed generated using Gemini API",
       feed_url: "", // Will be set dynamically
-      site_url: "", // Will be set dynamically
+      site_url: "https://smartfeed-f3b51.web.app/", // Will be set dynamically
       managingEditor: process.env.RSS_MANAGING_EDITOR || "rss@example.com",
       webMaster: process.env.RSS_WEBMASTER || "webmaster@example.com",
       copyright: `${new Date().getFullYear()} SmartFeed`,
       language: "en",
       categories: ["Technology", "AI", "RSS"],
       pubDate: new Date(),
-      ttl: 60, // Cache for 60 minutes
+      ttl: 15, // Cache for 15 minutes
     };
   }
 
@@ -37,7 +37,7 @@ export class RSSGenerator {
 
       // Update dynamic URLs
       this.config.feed_url = feedUrl;
-      this.config.site_url = feedUrl.replace("/feed.xml", "");
+      // this.config.site_url = feedUrl.replace("/feed.xml", "");
 
       // Create RSS feed
       const feed = new RSS(this.config);

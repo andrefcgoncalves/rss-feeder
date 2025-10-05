@@ -135,7 +135,7 @@ export const ingestUrl = onRequest(
       // Step 4: Generate RSS XML
       const bucket = storage.bucket();
       const feedFile = bucket.file("feed.xml");
-      
+
       // Get the public URL for the feed
       const feedUrl = `https://storage.googleapis.com/${bucket.name}/feed.xml`;
       
@@ -145,7 +145,7 @@ export const ingestUrl = onRequest(
       await feedFile.save(rssXml, {
         metadata: {
           contentType: "application/rss+xml",
-          cacheControl: "public, max-age=3600", // Cache for 1 hour
+          cacheControl: "public, max-age=900", // Cache for 15 minutes
         },
         public: true,
       });

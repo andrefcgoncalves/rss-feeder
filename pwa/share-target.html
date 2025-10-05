@@ -108,22 +108,66 @@
         const urlPreview = document.getElementById('urlPreview');
         const statusMessage = document.getElementById('statusMessage');
         const backButton = document.getElementById('backButton');
+
+        // Debug: Log all parameters
+        console.log('Share target parameters:', {
+            url: sharedUrl,
+            title: sharedTitle,
+            text: sharedText,
+            allParams: Object.fromEntries(urlParams)
+        });
+
+        // Show debug info on page for testing
+        // const debugInfo = document.createElement('div');
+        // debugInfo.style.cssText = 'position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 5px; font-size: 12px; z-index: 1000; max-width: 300px;';
+        // debugInfo.innerHTML = `
+        //     <strong>Debug Info:</strong><br>
+        //     URL: ${sharedUrl || 'null'}<br>
+        //     Title: ${sharedTitle || 'null'}<br>
+        //     Text: ${sharedText || 'null'}
+        // `;
+        // document.body.appendChild(debugInfo);
+
+        // Try to extract URL from different sources
+        let urlToProcess = sharedUrl;
+        
+        // If no URL parameter, try to get it from text or title
+        if (!urlToProcess && sharedText) {
+            // Look for URLs in the text
+            const urlMatch = sharedText.match(/https?:\/\/[^\s]+/);
+            if (urlMatch) {
+                urlToProcess = urlMatch[0];
+            }
+        }
+        
+        // If still no URL, try title
+        if (!urlToProcess && sharedTitle) {
+            const urlMatch = sharedTitle.match(/https?:\/\/[^\s]+/);
+            if (urlMatch) {
+                urlToProcess = urlMatch[0];
+            }
+        }
         
         // Display the shared URL
-        if (sharedUrl) {
-            urlPreview.textContent = sharedUrl;
+        if (urlToProcess) {
+            urlPreview.textContent = urlToProcess;
             urlPreview.style.display = 'block';
             
             // Process the shared content
-            processSharedUrl(sharedUrl);
+            processSharedUrl(urlToProcess);
         } else {
+            console.error('No URL found in share parameters:', {
+                url: sharedUrl,
+                title: sharedTitle,
+                text: sharedText
+            });
             showError('No URL was shared. Please try again.');
         }
 
         async function processSharedUrl(url) {
             try {
                 title.textContent = 'Adding to SmartFeed...';
-                
+
                 // Get API token from localStorage
                 const apiToken = localStorage.getItem('smartfeed_api_token');
                 if (!apiToken) {
@@ -142,7 +186,7 @@
                 });
                 
                 const result = await response.json();
-                
+
                 if (response.ok && result.success) {
                     showSuccess('✅ Successfully added to SmartFeed!');
                 } else {

@@ -2,6 +2,7 @@
   "name": "SmartFeed",
   "short_name": "SmartFeed",
   "description": "SmartFeed - Share content to your AI-powered RSS feed",
+  "version": "1.0.1",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#4285f4",
@@ -58,6 +59,9 @@
       "url": "url"
     }
   },
-  "categories": ["productivity", "utilities"],
+  "categories": [
+    "productivity",
+    "utilities"
+  ],
   "lang": "en-US"
 }
