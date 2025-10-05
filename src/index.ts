@@ -14,6 +14,16 @@ const apiToken = defineSecret("API_TOKEN");
  * Validates the request authorization
  */
 function validateAuth(request: any): boolean {
+  // Check if this is a request from our own PWA (via Firebase Hosting rewrite)
+  const referer = request.get("Referer");
+  const userAgent = request.get("User-Agent");
+  
+  // Allow requests from our own domain (PWA share target)
+  if (referer && (referer.includes(".web.app") || referer.includes(".firebaseapp.com"))) {
+    return true;
+  }
+
+  // For external requests, require API token
   const authHeader = request.get("Authorization");
   const bodyToken = request.body?.token;
   const expectedToken = apiToken.value();

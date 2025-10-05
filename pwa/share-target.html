@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sharing to RSS Feed...</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 500px;
+            padding: 40px 20px;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 30px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .status {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+        
+        .status.success {
+            background: rgba(76, 175, 80, 0.2);
+        }
+        
+        .status.error {
+            background: rgba(244, 67, 54, 0.2);
+        }
+        
+        .url-preview {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            word-break: break-all;
+            font-size: 14px;
+        }
+        
+        .back-button {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+        
+        .back-button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner" id="spinner"></div>
+        <h1 id="title">Processing Shared Content</h1>
+        <div id="urlPreview" class="url-preview" style="display: none;"></div>
+        <div id="statusMessage" class="status" style="display: none;"></div>
+        <a href="/" class="back-button" id="backButton" style="display: none;">← Back to Home</a>
+    </div>
+    
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const sharedUrl = urlParams.get('url');
+        const sharedTitle = urlParams.get('title');
+        const sharedText = urlParams.get('text');
+        
+        const spinner = document.getElementById('spinner');
+        const title = document.getElementById('title');
+        const urlPreview = document.getElementById('urlPreview');
+        const statusMessage = document.getElementById('statusMessage');
+        const backButton = document.getElementById('backButton');
+        
+        // Display the shared URL
+        if (sharedUrl) {
+            urlPreview.textContent = sharedUrl;
+            urlPreview.style.display = 'block';
+            
+            // Process the shared content
+            processSharedUrl(sharedUrl);
+        } else {
+            showError('No URL was shared. Please try again.');
+        }
+        
+        async function processSharedUrl(url) {
+            try {
+                title.textContent = 'Adding to RSS Feed...';
+                
+                // This will be proxied to the Cloud Function via Firebase Hosting rewrite
+                const response = await fetch('/api/ingest', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ url })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    showSuccess('✅ Successfully added to your RSS feed!');
+                } else {
+                    showError('❌ ' + (result.message || 'Failed to add to RSS feed'));
+                }
+                
+            } catch (error) {
+                console.error('Error processing shared URL:', error);
+                showError('❌ Network error: ' + error.message);
+            }
+        }
+        
+        function showSuccess(message) {
+            spinner.style.display = 'none';
+            title.textContent = 'Success!';
+            statusMessage.textContent = message;
+            statusMessage.className = 'status success';
+            statusMessage.style.display = 'block';
+            backButton.style.display = 'inline-block';
+        }
+        
+        function showError(message) {
+            spinner.style.display = 'none';
+            title.textContent = 'Error';
+            statusMessage.textContent = message;
+            statusMessage.className = 'status error';
+            statusMessage.style.display = 'block';
+            backButton.style.display = 'inline-block';
+        }
+    </script>
+</body>
+</html>

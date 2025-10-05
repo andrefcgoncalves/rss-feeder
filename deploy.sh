@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Deployment script for Gemini RSS Generator
-# This script handles the complete deployment process
+# This script handles the complete deployment process including clients
 
 set -e
 
@@ -65,9 +65,20 @@ if [ $? -eq 0 ]; then
     echo "🎉 Deployment successful!"
     echo ""
     echo "📋 Next steps:"
-    echo "1. Note your function URL from the deployment output"
-    echo "2. Test the endpoint with a POST request"
-    echo "3. Access your RSS feed at: https://storage.googleapis.com/YOUR-PROJECT.appspot.com/feed.xml"
+    echo ""
+    echo "🖥️  Desktop Chrome Extension:"
+    echo "1. Open Chrome → chrome://extensions/"
+    echo "2. Enable Developer mode"
+    echo "3. Load unpacked → select 'chrome-extension' folder"
+    echo "4. Configure with your API endpoint and token"
+    echo ""
+    echo "📱 Mobile PWA:"
+    echo "1. Visit your Firebase Hosting URL on mobile"
+    echo "2. Install PWA (Add to Home Screen)"
+    echo "3. Share content from any app → select 'RSS Share'"
+    echo ""
+    echo "🌐 RSS Feed:"
+    echo "   https://storage.googleapis.com/YOUR-PROJECT.appspot.com/feed.xml"
     echo ""
     echo "📖 For detailed usage instructions, see README.md"
 else

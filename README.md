@@ -1,22 +1,28 @@
 # Gemini-Powered RSS Generator
 
-A serverless RSS feed generator that uses Google's Gemini AI to intelligently parse and summarize content from URLs.
+A comprehensive serverless RSS feed generator that uses Google's Gemini AI to intelligently parse and summarize content from URLs. Includes both desktop (Chrome extension) and mobile (PWA) sharing capabilities.
 
-## Architecture
+## 🏗️ Architecture
 
 - **Backend**: Firebase Cloud Functions (Node.js/TypeScript)
 - **Database**: Cloud Firestore for storing feed items
 - **Storage**: Cloud Storage for hosting the RSS feed file
 - **AI**: Google Gemini API for content parsing and summarization
+- **Hosting**: Firebase Hosting for PWA
+- **Desktop Client**: Chrome browser extension
+- **Mobile Client**: Progressive Web App with Share Target API
 
-## Features
+## ✨ Features
 
 - 🤖 AI-powered content parsing using Gemini API
+- 🖥️ **Chrome extension** for easy desktop sharing
+- 📱 **Progressive Web App** for native mobile sharing
 - 🔒 Secure API endpoint with token authentication
 - ⚡ Serverless architecture with automatic scaling
 - 📊 Stores up to 25 latest items in RSS feed
 - 🌐 Public RSS feed accessible from any RSS reader
 - ⏱️ Smart caching with 1-hour TTL
+- 🎯 Cross-platform compatibility
 
 ## Setup
 
@@ -48,16 +54,41 @@ A serverless RSS feed generator that uses Google's Gemini AI to intelligently pa
    firebase deploy
    ```
 
-## Usage
+## 📱 Client Applications
 
-### Adding URLs to RSS Feed
+### Chrome Extension (Desktop)
 
-Send a POST request to your Cloud Function endpoint:
+1. **Installation**: Load unpacked in `chrome://extensions/`
+2. **Location**: `chrome-extension/` directory
+3. **Features**: One-click sharing from any webpage
+4. **Documentation**: See `chrome-extension/README.md`
 
+### Progressive Web App (Mobile)
+
+1. **URL**: Hosted on Firebase Hosting (your-project.web.app)
+2. **Location**: `pwa/` directory  
+3. **Features**: Native mobile sharing via Share Target API
+4. **Documentation**: See `pwa/README.md`
+
+## 🚀 Usage
+
+### Desktop (Chrome Extension)
+1. Install extension in Chrome
+2. Configure API endpoint and token
+3. Navigate to any webpage
+4. Click extension icon → "Share This Page"
+
+### Mobile (PWA)
+1. Visit your Firebase Hosting URL on mobile
+2. Install PWA ("Add to Home Screen")
+3. Share content from any app
+4. Select "RSS Share" from share options
+
+### Direct API (Programmatic)
 ```bash
-curl -X POST https://your-region-your-project.cloudfunctions.net/ingestUrl \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer YOUR_API_TOKEN" \\
+curl -X POST https://your-region-your-project.cloudfunctions.net/ingestUrl \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
   -d '{"url": "https://example.com/article"}'
 ```
 

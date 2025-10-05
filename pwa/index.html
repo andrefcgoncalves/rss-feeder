@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSS Share - AI-Powered RSS Generator</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4285f4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="RSS Share">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png">
+    <link rel="apple-touch-icon" href="/icons/icon-152.png">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .hero .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .install-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            margin: 40px auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            max-width: 600px;
+        }
+        
+        .install-card h2 {
+            color: #4285f4;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .install-steps {
+            list-style: none;
+            counter-reset: step-counter;
+        }
+        
+        .install-steps li {
+            counter-increment: step-counter;
+            margin: 20px 0;
+            padding-left: 50px;
+            position: relative;
+        }
+        
+        .install-steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #4285f4;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .install-button {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            margin: 20px 0;
+            transition: background 0.3s;
+        }
+        
+        .install-button:hover {
+            background: #3367d6;
+        }
+        
+        .install-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+        
+        .feature {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .feature h3 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .footer {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            margin-top: 60px;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .install-card {
+                margin: 20px;
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <h1>📰 RSS Share</h1>
+            <div class="subtitle">Share any webpage to your AI-powered RSS feed</div>
+        </div>
+        
+        <div class="install-card">
+            <h2>🚀 Install PWA for Mobile Sharing</h2>
+            <p>Add this app to your home screen to enable sharing from any app on your device.</p>
+            
+            <button class="install-button" id="installButton">
+                📱 Add to Home Screen
+            </button>
+            
+            <div id="statusMessage" class="status" style="display: none;"></div>
+            
+            <ol class="install-steps">
+                <li>Tap "Add to Home Screen" above (or use your browser's menu)</li>
+                <li>Confirm the installation when prompted</li>
+                <li>Find the RSS Share icon on your home screen</li>
+                <li>Use the system share button in any app and select "RSS Share"</li>
+            </ol>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🤖</div>
+                <h3>AI-Powered</h3>
+                <p>Uses Google Gemini to intelligently summarize content</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📱</div>
+                <h3>Mobile Native</h3>
+                <p>Appears in your device's native share menu</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <h3>Instant Sync</h3>
+                <p>Updates your RSS feed in real-time</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Powered by Firebase & Gemini AI</p>
+        </div>
+    </div>
+    
+    <script>
+        let deferredPrompt;
+        const installButton = document.getElementById('installButton');
+        const statusMessage = document.getElementById('statusMessage');
+        
+        // Check if PWA is already installed
+        if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+            showStatus('✅ PWA is installed! Use the share button in other apps.', 'success');
+            installButton.textContent = '✅ Already Installed';
+            installButton.disabled = true;
+        }
+        
+        // Listen for the beforeinstallprompt event
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installButton.style.display = 'block';
+        });
+        
+        // Handle install button click
+        installButton.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const result = await deferredPrompt.userChoice;
+                
+                if (result.outcome === 'accepted') {
+                    showStatus('✅ PWA installed successfully!', 'success');
+                    installButton.textContent = '✅ Installed';
+                    installButton.disabled = true;
+                } else {
+                    showStatus('ℹ️ Installation cancelled. You can install later from your browser menu.', 'info');
+                }
+                
+                deferredPrompt = null;
+            } else {
+                // Fallback instructions for manual installation
+                showStatus('ℹ️ Use your browser\'s "Add to Home Screen" option in the menu.', 'info');
+            }
+        });
+        
+        // Listen for app installation
+        window.addEventListener('appinstalled', () => {
+            showStatus('✅ PWA installed! You can now share content from any app.', 'success');
+            installButton.textContent = '✅ Installed';
+            installButton.disabled = true;
+        });
+        
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status ${type}`;
+            statusMessage.style.display = 'block';
+        }
+        
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then((registration) => {
+                    console.log('SW registered: ', registration);
+                })
+                .catch((registrationError) => {
+                    console.log('SW registration failed: ', registrationError);
+                });
+        }
+    </script>
+</body>
+</html>

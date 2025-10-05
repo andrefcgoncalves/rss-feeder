@@ -15,6 +15,48 @@
       ]
     }
   ],
+  "hosting": {
+    "public": "pwa",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/share-target",
+        "destination": "/share-target.html"
+      },
+      {
+        "source": "/api/ingest",
+        "function": "ingestUrl"
+      }
+    ],
+    "headers": [
+      {
+        "source": "/manifest.json",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=3600"
+          },
+          {
+            "key": "Content-Type", 
+            "value": "application/manifest+json"
+          }
+        ]
+      },
+      {
+        "source": "/sw.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=0"
+          }
+        ]
+      }
+    ]
+  },
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
@@ -31,6 +73,9 @@
     },
     "storage": {
       "port": 9199
+    },
+    "hosting": {
+      "port": 5000
     },
     "ui": {
       "enabled": true
