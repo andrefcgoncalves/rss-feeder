@@ -1,13 +1,13 @@
-# Progressive Web App (PWA) Documentation
+# Progressive Web App (PWA) Documentation - SmartFeed
 
 ## Overview
 
-The PWA component enables mobile users to share content to their RSS feed directly from any app using the native share button.
+The PWA component enables mobile users to share content to SmartFeed directly from any app using the native share button.
 
 ## Architecture
 
 ```
-Mobile App Share → System Share Sheet → RSS Share PWA → Firebase Hosting → Cloud Function
+Mobile App Share → System Share Sheet → SmartFeed PWA → Firebase Hosting → Cloud Function
 ```
 
 ## Files Structure
@@ -32,7 +32,7 @@ pwa/
 ### 2. Sharing Content
 - User finds content in any app (browser, news app, etc.)
 - Taps the system share button
-- Selects "RSS Share" from share options
+- Selects "SmartFeed" from share options
 - Content URL is sent to share-target.html
 - Page processes the URL via Cloud Function
 - User gets immediate feedback

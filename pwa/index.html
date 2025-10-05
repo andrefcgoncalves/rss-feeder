@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RSS Share - AI-Powered RSS Generator</title>
+    <title>SmartFeed - AI-Powered RSS Generator</title>
     
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#4285f4">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="RSS Share">
+    <meta name="apple-mobile-web-app-title" content="SmartFeed">
     
     <!-- Icons -->
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
@@ -196,16 +196,16 @@
 <body>
     <div class="container">
         <div class="hero">
-            <h1>📰 RSS Share</h1>
-            <div class="subtitle">Share any webpage to your AI-powered RSS feed</div>
+            <h1>📱 SmartFeed</h1>
+            <div class="subtitle">Share any webpage to SmartFeed - your AI-powered RSS feed</div>
         </div>
         
         <div class="install-card">
-            <h2>🚀 Install PWA for Mobile Sharing</h2>
+            <h2>🚀 Install SmartFeed for Mobile Sharing</h2>
             <p>Add this app to your home screen to enable sharing from any app on your device.</p>
             
             <button class="install-button" id="installButton">
-                📱 Add to Home Screen
+                📱 Add SmartFeed to Home Screen
             </button>
             
             <div id="statusMessage" class="status" style="display: none;"></div>
@@ -213,8 +213,8 @@
             <ol class="install-steps">
                 <li>Tap "Add to Home Screen" above (or use your browser's menu)</li>
                 <li>Confirm the installation when prompted</li>
-                <li>Find the RSS Share icon on your home screen</li>
-                <li>Use the system share button in any app and select "RSS Share"</li>
+                <li>Find the SmartFeed icon on your home screen</li>
+                <li>Use the system share button in any app and select "SmartFeed"</li>
             </ol>
         </div>
         
@@ -248,7 +248,7 @@
         
         // Check if PWA is already installed
         if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
-            showStatus('✅ PWA is installed! Use the share button in other apps.', 'success');
+                showStatus('✅ SmartFeed is installed! Use the share button in other apps.', 'success');
             installButton.textContent = '✅ Already Installed';
             installButton.disabled = true;
         }
@@ -267,7 +267,7 @@
                 const result = await deferredPrompt.userChoice;
                 
                 if (result.outcome === 'accepted') {
-                    showStatus('✅ PWA installed successfully!', 'success');
+                    showStatus('✅ SmartFeed installed successfully!', 'success');
                     installButton.textContent = '✅ Installed';
                     installButton.disabled = true;
                 } else {
@@ -283,7 +283,7 @@
         
         // Listen for app installation
         window.addEventListener('appinstalled', () => {
-            showStatus('✅ PWA installed! You can now share content from any app.', 'success');
+                showStatus('✅ SmartFeed installed! You can now share content from any app.', 'success');
             installButton.textContent = '✅ Installed';
             installButton.disabled = true;
         });

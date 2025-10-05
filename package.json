@@ -1,7 +1,7 @@
 {
-  "name": "gemini-rss-generator",
+  "name": "smartfeed",
   "version": "1.0.0",
-  "description": "Serverless Gemini-powered RSS feed generator using Firebase Cloud Functions",
+  "description": "SmartFeed - AI-powered RSS feed generator using Firebase Cloud Functions and Gemini API",
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",

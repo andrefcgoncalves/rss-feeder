@@ -1,6 +1,6 @@
-# PWA Icons
+# SmartFeed PWA Icons
 
-The pwa/icons/ directory should contain the following icon files for the Progressive Web App:
+The pwa/icons/ directory contains SmartFeed icons for the Progressive Web App:
 
 - icon-16.png (16x16 pixels)
 - icon-32.png (32x32 pixels)
@@ -48,3 +48,5 @@ You can create these icons using any image editor or online tool. The icons shou
 ## Installation
 
 After creating the icons, place them in the pwa/icons/ directory with the exact filenames listed above.
+
+**Note**: Icons have been automatically generated from your SmartFeed logo using the process-logos.sh script.

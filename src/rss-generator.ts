@@ -11,13 +11,13 @@ export class RSSGenerator {
   constructor() {
     // Default RSS feed configuration
     this.config = {
-      title: "Gemini RSS Feed",
+      title: "SmartFeed",
       description: "AI-powered RSS feed generated using Gemini API",
       feed_url: "", // Will be set dynamically
       site_url: "", // Will be set dynamically
       managingEditor: process.env.RSS_MANAGING_EDITOR || "rss@example.com",
       webMaster: process.env.RSS_WEBMASTER || "webmaster@example.com",
-      copyright: `${new Date().getFullYear()} Gemini RSS Generator`,
+      copyright: `${new Date().getFullYear()} SmartFeed`,
       language: "en",
       categories: ["Technology", "AI", "RSS"],
       pubDate: new Date(),

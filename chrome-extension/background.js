@@ -1,6 +1,6 @@
 // Background service worker for Chrome extension
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('Gemini RSS Share extension installed');
+  console.log('SmartFeed extension installed');
 });
 
 // Handle messages from popup
@@ -55,7 +55,7 @@ async function handleShareCurrentTab(sendResponse) {
     if (response.ok && result.success) {
       sendResponse({ 
         success: true, 
-        message: 'Page added to RSS feed successfully!',
+        message: 'Page added to SmartFeed successfully!',
         feedUrl: result.feedUrl
       });
     } else {

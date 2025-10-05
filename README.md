@@ -1,6 +1,6 @@
-# Gemini-Powered RSS Generator
+# SmartFeed - AI-Powered RSS Generator
 
-A comprehensive serverless RSS feed generator that uses Google's Gemini AI to intelligently parse and summarize content from URLs. Includes both desktop (Chrome extension) and mobile (PWA) sharing capabilities.
+A comprehensive serverless RSS feed generator that uses Google's Gemini AI to intelligently parse and summarize content from URLs. SmartFeed includes both desktop (Chrome extension) and mobile (PWA) sharing capabilities.
 
 ## 🏗️ Architecture
 
@@ -15,7 +15,7 @@ A comprehensive serverless RSS feed generator that uses Google's Gemini AI to in
 ## ✨ Features
 
 - 🤖 AI-powered content parsing using Gemini API
-- 🖥️ **Chrome extension** for easy desktop sharing
+- 🖥️ **Chrome extension** for easy desktop sharing to SmartFeed
 - 📱 **Progressive Web App** for native mobile sharing
 - 🔒 Secure API endpoint with token authentication
 - ⚡ Serverless architecture with automatic scaling

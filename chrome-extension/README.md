@@ -1,6 +1,6 @@
-# Chrome Extension: Gemini RSS Share
+# Chrome Extension: SmartFeed
 
-A Chrome browser extension that allows users to easily share the current webpage to their AI-powered RSS feed.
+A Chrome browser extension that allows users to easily share the current webpage to SmartFeed - their AI-powered RSS feed.
 
 ## Features
 
@@ -27,7 +27,7 @@ A Chrome browser extension that allows users to easily share the current webpage
 
 ## Configuration
 
-Before using the extension, you need to configure it with your RSS service details:
+Before using the extension, you need to configure it with your SmartFeed service details:
 
 1. Click the extension icon in your toolbar
 2. Click "⚙️ Settings"

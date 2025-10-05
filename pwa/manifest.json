@@ -1,7 +1,7 @@
 {
-  "name": "Gemini RSS Share",
-  "short_name": "RSS Share",
-  "description": "Share content to your AI-powered RSS feed using Gemini API",
+  "name": "SmartFeed",
+  "short_name": "SmartFeed",
+  "description": "SmartFeed - Share content to your AI-powered RSS feed",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#4285f4",

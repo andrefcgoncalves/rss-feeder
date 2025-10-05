@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sharing to RSS Feed...</title>
+    <title>Sharing to SmartFeed...</title>
     
     <style>
         * {
@@ -124,7 +124,7 @@
         
         async function processSharedUrl(url) {
             try {
-                title.textContent = 'Adding to RSS Feed...';
+                title.textContent = 'Adding to SmartFeed...';
                 
                 // This will be proxied to the Cloud Function via Firebase Hosting rewrite
                 const response = await fetch(API_ENDPOINTS.INGEST, {
@@ -138,9 +138,9 @@
                 const result = await response.json();
                 
                 if (response.ok && result.success) {
-                    showSuccess('✅ Successfully added to your RSS feed!');
+                    showSuccess('✅ Successfully added to SmartFeed!');
                 } else {
-                    showError('❌ ' + (result.message || 'Failed to add to RSS feed'));
+                    showError('❌ ' + (result.message || 'Failed to add to SmartFeed'));
                 }
                 
             } catch (error) {

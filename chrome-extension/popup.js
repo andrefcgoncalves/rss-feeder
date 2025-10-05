@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     setLoading(true);
-    showStatus('Adding page to RSS feed...', 'loading');
+    showStatus('Adding page to SmartFeed...', 'loading');
 
     try {
       // Send message to background script
