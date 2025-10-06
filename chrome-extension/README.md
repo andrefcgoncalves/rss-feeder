@@ -36,8 +36,9 @@ A Chrome browser extension that allows users to easily share the current webpage
 
 ## Configuration
 
-The extension is pre-configured with your SmartFeed endpoint:
-- **Endpoint**: `https://ingesturl-bnedqqqzpa-uc.a.run.app` (hardcoded)
+The extension is pre-configured with your SmartFeed endpoints:
+- **Ingest Endpoint**: `https://ingesturl-bnedqqqzpa-uc.a.run.app` (for sharing pages)
+- **Regenerate Endpoint**: `https://regeneraterss-bnedqqqzpa-uc.a.run.app` (for updating RSS)
 - **API Token**: User-configurable (stored securely in Chrome storage)
 
 ## Security

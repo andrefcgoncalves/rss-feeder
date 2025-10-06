@@ -178,3 +178,122 @@ export const ingestUrl = onRequest(
     }
   }
 );
+
+/**
+ * Validates authentication for regenerate RSS endpoint (no URL required)
+ */
+function validateRegenerateAuth(request: Request): boolean {
+  // Check if this is a request from our own PWA (via Firebase Hosting rewrite)
+  const referer = request.get("Referer");
+  
+  // Allow requests from our own domain (PWA share target)
+  if (referer && (referer.includes(".web.app") || referer.includes(".firebaseapp.com"))) {
+    return true;
+  }
+
+  // For external requests, require API token
+  const authHeader = request.get("Authorization");
+  const expectedToken = apiToken.value();
+
+  // Check Authorization header (Bearer token)
+  const providedToken = authHeader?.replace("Bearer ", "");
+  
+  return providedToken === expectedToken;
+}
+
+/**
+ * Regenerate RSS feed from existing Firestore data
+ */
+export const regenerateRSS = onRequest(
+  {
+    secrets: [geminiApiKey, apiToken],
+    cors: true,
+    memory: "512MiB",
+    timeoutSeconds: 300,
+  },
+  async (req, res) => {
+    // Only allow POST requests
+    if (req.method !== "POST") {
+      res.status(405).json({success: false, message: "Method not allowed"});
+      return;
+    }
+
+    // Validate authentication (no URL validation needed)
+    if (!validateRegenerateAuth(req)) {
+      res.status(401).json({success: false, message: "Unauthorized"});
+      return;
+    }
+
+    try {
+      logger.info("Starting RSS regeneration from existing data");
+
+      // Step 1: Get all feed items from Firestore
+      const feedItemsSnapshot = await db
+        .collection(FEED_ITEMS_COLLECTION)
+        .orderBy("pubDate", "desc")
+        .limit(25)
+        .get();
+
+      if (feedItemsSnapshot.empty) {
+        logger.warn("No feed items found in Firestore");
+        res.status(404).json({
+          success: false,
+          message: "No feed items found to regenerate RSS"
+        });
+        return;
+      }
+
+      const feedItems: FeedItem[] = feedItemsSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        url: doc.data().url,
+        title: doc.data().title,
+        description: doc.data().description,
+        pubDate: doc.data().pubDate,
+      }));
+
+      logger.info(`Found ${feedItems.length} feed items to regenerate RSS`);
+
+      // Step 2: Get Cloud Storage bucket and file reference
+      const bucket = storage.bucket();
+      const feedFile = bucket.file("feed.xml");
+
+      // Step 3: Generate RSS XML
+      const feedUrl = `https://storage.googleapis.com/${bucket.name}/feed.xml`;
+      const rssGenerator = new RSSGenerator();
+      const rssXml = rssGenerator.generateRSSXML(feedItems, feedUrl);
+
+      // Step 4: Upload to Cloud Storage
+      await feedFile.save(rssXml, {
+        metadata: {
+          contentType: "application/rss+xml",
+          cacheControl: "private", // Cache for 15 minutes
+        },
+        public: true,
+      });
+
+      logger.info("RSS feed regenerated successfully", {
+        feedUrl,
+        itemCount: feedItems.length,
+      });
+
+      // Return success response
+      const response: IngestionResponse = {
+        success: true,
+        message: `RSS feed regenerated successfully with ${feedItems.length} items`,
+        feedUrl,
+      };
+
+      res.status(200).json(response);
+
+    } catch (error) {
+      logger.error("Error regenerating RSS feed", {error});
+      
+      const response: IngestionResponse = {
+        success: false,
+        message: `Internal server error: ${error}`,
+      };
+      
+      res.status(500).json(response);
+    }
+  }
+);

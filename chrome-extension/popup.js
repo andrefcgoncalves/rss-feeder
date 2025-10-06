@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', async function() {
   const shareBtn = document.getElementById('shareBtn');
   const shareText = document.getElementById('shareText');
   const spinner = document.getElementById('spinner');
+  const updateRssBtn = document.getElementById('updateRssBtn');
+  const updateText = document.getElementById('updateText');
+  const updateSpinner = document.getElementById('updateSpinner');
   const configBtn = document.getElementById('configBtn');
   const configForm = document.getElementById('configForm');
   const statusDiv = document.getElementById('status');
@@ -13,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   // SmartFeed API configuration
   const API_ENDPOINT = 'https://ingesturl-bnedqqqzpa-uc.a.run.app';
+  const REGENERATE_ENDPOINT = 'https://regeneraterss-bnedqqqzpa-uc.a.run.app';
 
   let currentTab = null;
   let isConfigMode = false;
@@ -99,6 +103,48 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
   });
 
+  // Update RSS button click handler
+  updateRssBtn.addEventListener('click', async function() {
+    // Check if API token is configured
+    const config = await chrome.storage.sync.get(['apiToken']);
+    if (!config.apiToken) {
+      showStatus('Please configure your API token first', 'error');
+      toggleConfigMode();
+      return;
+    }
+
+    setUpdateLoading(true);
+    showStatus('Regenerating RSS feed...', 'loading');
+
+    try {
+      // Call the regenerate RSS endpoint
+      const response = await fetch(REGENERATE_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${config.apiToken}`
+        }
+      });
+
+      const result = await response.json();
+      setUpdateLoading(false);
+
+      if (response.ok && result.success) {
+        showStatus('✅ ' + result.message, 'success');
+        if (result.feedUrl) {
+          setTimeout(() => {
+            showStatus(`Feed available at: ${result.feedUrl}`, 'success');
+          }, 2000);
+        }
+      } else {
+        showStatus('❌ ' + result.message, 'error');
+      }
+    } catch (error) {
+      setUpdateLoading(false);
+      showStatus('❌ Extension error: ' + error.message, 'error');
+    }
+  });
+
   // Configuration button click handler
   configBtn.addEventListener('click', function() {
     toggleConfigMode();
@@ -144,6 +190,18 @@ document.addEventListener('DOMContentLoaded', async function() {
       spinner.style.display = 'none';
       shareText.textContent = 'Share This Page';
       shareBtn.disabled = false;
+    }
+  }
+
+  function setUpdateLoading(loading) {
+    if (loading) {
+      updateSpinner.style.display = 'inline-block';
+      updateText.textContent = 'Updating...';
+      updateRssBtn.disabled = true;
+    } else {
+      updateSpinner.style.display = 'none';
+      updateText.textContent = '🔄 Update RSS';
+      updateRssBtn.disabled = false;
     }
   }
 
