@@ -1,0 +1,41 @@
+{
+  "name": "smartfeed",
+  "version": "1.0.0",
+  "description": "SmartFeed - AI-powered RSS feed generator using Firebase Cloud Functions and Gemini API",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy:functions": "npm run build && firebase deploy --only functions",
+    "logs": "firebase functions:log",
+    "lint": "eslint src/**/*.ts",
+    "test": "jest",
+    "deploy": "npm run build && firebase deploy"
+  },
+  "engines": {
+    "node": "22"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.5",
+    "@types/node": "^22.0.0",
+    "@types/rss": "^0.0.32",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "firebase-functions-test": "^3.1.0",
+    "jest": "^29.6.4",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.6.0"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.17.1",
+    "firebase-admin": "^11.8.0",
+    "firebase-functions": "^4.3.1",
+    "rss": "^1.2.2"
+  },
+  "private": true
+}
