@@ -37,10 +37,20 @@ export class RSSGenerator {
 
       // Update dynamic URLs
       this.config.feed_url = feedUrl;
-      // this.config.site_url = feedUrl.replace("/feed.xml", "");
+      this.config.site_url = feedUrl.replace("/feed.xml", "");
+
+      // Add favicon/image URL for RSS readers
+      const baseUrl = feedUrl.replace("/feed.xml", "");
+      const rssConfigWithImage = {
+        ...this.config,
+        image_url: `${baseUrl}/favicon.png`,
+        custom_namespaces: {
+          'atom': 'http://www.w3.org/2005/Atom'
+        }
+      };
 
       // Create RSS feed
-      const feed = new RSS(this.config);
+      const feed = new RSS(rssConfigWithImage);
 
       // Add each feed item to the RSS
       feedItems.forEach((item) => {
