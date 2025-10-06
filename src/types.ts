@@ -50,20 +50,3 @@ export interface IngestionResponse {
   feedUrl?: string;
   itemId?: string;
 }
-
-/**
- * RSS feed configuration
- */
-export interface RSSConfig {
-  title: string;
-  description: string;
-  feed_url: string;
-  site_url: string;
-  managingEditor: string;
-  webMaster: string;
-  copyright: string;
-  language: string;
-  categories: string[];
-  pubDate: Date;
-  ttl: number;
-}

@@ -145,7 +145,7 @@ export const ingestUrl = onRequest(
       await feedFile.save(rssXml, {
         metadata: {
           contentType: "application/rss+xml",
-          cacheControl: "public, max-age=900", // Cache for 15 minutes
+          cacheControl: "private", // Cache for 15 minutes
         },
         public: true,
       });

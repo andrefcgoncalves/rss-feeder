@@ -1,20 +1,22 @@
 import RSS from "rss";
 import {logger} from "firebase-functions";
-import {FeedItem, RSSConfig} from "./types";
+import {FeedItem} from "./types";
 
 /**
  * Service for generating RSS XML feeds
  */
 export class RSSGenerator {
-  private config: RSSConfig;
+  private config: RSS.FeedOptions;
+  private baseUrl: string;
 
   constructor() {
+    this.baseUrl = "https://smartfeed-f3b51.web.app/";
     // Default RSS feed configuration
     this.config = {
       title: "SmartFeed",
       description: "AI-powered RSS feed generated using Gemini API",
       feed_url: "", // Will be set dynamically
-      site_url: "https://smartfeed-f3b51.web.app/", // Will be set dynamically
+      site_url: this.baseUrl, // Will be set dynamically
       managingEditor: process.env.RSS_MANAGING_EDITOR || "rss@example.com",
       webMaster: process.env.RSS_WEBMASTER || "webmaster@example.com",
       copyright: `${new Date().getFullYear()} SmartFeed`,
@@ -22,6 +24,10 @@ export class RSSGenerator {
       categories: ["Technology", "AI", "RSS"],
       pubDate: new Date(),
       ttl: 15, // Cache for 15 minutes
+      image_url: `${this.baseUrl}favicon.png`,
+      custom_namespaces: {
+        'atom': 'http://www.w3.org/2005/Atom'
+      }
     };
   }
 
@@ -37,20 +43,9 @@ export class RSSGenerator {
 
       // Update dynamic URLs
       this.config.feed_url = feedUrl;
-      this.config.site_url = feedUrl.replace("/feed.xml", "");
-
-      // Add favicon/image URL for RSS readers
-      const baseUrl = feedUrl.replace("/feed.xml", "");
-      const rssConfigWithImage = {
-        ...this.config,
-        image_url: `${baseUrl}/favicon.png`,
-        custom_namespaces: {
-          'atom': 'http://www.w3.org/2005/Atom'
-        }
-      };
 
       // Create RSS feed
-      const feed = new RSS(rssConfigWithImage);
+      const feed = new RSS(this.config);
 
       // Add each feed item to the RSS
       feedItems.forEach((item) => {
@@ -78,7 +73,7 @@ export class RSSGenerator {
    * Update RSS configuration
    * @param newConfig Partial configuration to update
    */
-  updateConfig(newConfig: Partial<RSSConfig>): void {
+  updateConfig(newConfig: Partial<RSS.FeedOptions>): void {
     this.config = {...this.config, ...newConfig};
   }
 
@@ -86,7 +81,7 @@ export class RSSGenerator {
    * Get current RSS configuration
    * @returns Current RSS configuration
    */
-  getConfig(): RSSConfig {
+  getConfig(): RSS.FeedOptions {
     return {...this.config};
   }
 }
