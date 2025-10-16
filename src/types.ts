@@ -50,3 +50,43 @@ export interface IngestionResponse {
   feedUrl?: string;
   itemId?: string;
 }
+
+/**
+ * Newsletter item stored in Firestore
+ */
+export interface NewsletterItem {
+  /** Auto-generated Firestore Document ID */
+  id: string;
+  /** Newsletter title extracted from email */
+  title: string;
+  /** Newsletter content (HTML) */
+  content: string;
+  /** Plain text version of content */
+  textContent: string;
+  /** Newsletter sender/from email */
+  from: string;
+  /** Newsletter subject */
+  subject: string;
+  /** Date the newsletter was received */
+  pubDate: Timestamp;
+  /** Parseur webhook data */
+  parseurData?: any;
+}
+
+/**
+ * Parseur webhook request body
+ */
+export interface ParseurWebhookRequest {
+  /** Newsletter title */
+  title: string;
+  /** Newsletter HTML content */
+  html: string;
+  /** Newsletter text content */
+  text: string;
+  /** Sender email */
+  from: string;
+  /** Email subject */
+  subject: string;
+  /** Additional Parseur metadata */
+  [key: string]: any;
+}

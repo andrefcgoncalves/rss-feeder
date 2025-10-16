@@ -3,10 +3,11 @@ import {defineSecret} from "firebase-functions/params";
 import {logger} from "firebase-functions";
 import {Timestamp} from "firebase-admin/firestore";
 import {Request} from "firebase-functions/v2/https";
-import {db, storage, FEED_ITEMS_COLLECTION} from "./firebase";
+import {db, storage, FEED_ITEMS_COLLECTION, NEWSLETTER_ITEMS_COLLECTION} from "./firebase";
 import {GeminiService, geminiApiKey} from "./gemini-service";
 import {RSSGenerator} from "./rss-generator";
-import {FeedItem, IngestionRequest, IngestionResponse} from "./types";
+import {NewsletterParser} from "./newsletter-parser";
+import {FeedItem, IngestionRequest, IngestionResponse, NewsletterItem, ParseurWebhookRequest} from "./types";
 
 // Define the secret for API access token
 const apiToken = defineSecret("API_TOKEN");
@@ -294,6 +295,230 @@ export const regenerateRSS = onRequest(
       };
       
       res.status(500).json(response);
+    }
+  }
+);
+
+/**
+ * Parseur webhook endpoint for email newsletters
+ */
+export const parseurWebhook = onRequest(
+  {
+    secrets: [geminiApiKey, apiToken],
+    cors: true,
+    memory: "512MiB",
+    timeoutSeconds: 300,
+  },
+  async (req, res) => {
+    logger.info("Parseur webhook called", {
+      method: req.method,
+      url: req.url,
+      headers: req.headers,
+    });
+
+    try {
+      // Validate HTTP method
+      if (req.method !== "POST") {
+        res.status(405).json({
+          success: false,
+          message: "Method not allowed. Use POST.",
+        });
+        return;
+      }
+
+      // Parse request body
+      const webhookData: ParseurWebhookRequest = req.body;
+      
+      // Validate webhook data
+      const newsletterParser = new NewsletterParser();
+      if (!newsletterParser.validateWebhookData(webhookData)) {
+        res.status(400).json({
+          success: false,
+          message: "Invalid webhook data. Missing required fields: subject, html/text, from",
+        });
+        return;
+      }
+
+      logger.info(`Processing newsletter from: ${webhookData.from}`);
+
+      // Parse newsletter content
+      const newsletterItem = newsletterParser.parseNewsletter(webhookData);
+      
+      // Save to Firestore
+      const newsletterItemsRef = db.collection(NEWSLETTER_ITEMS_COLLECTION);
+      const docRef = await newsletterItemsRef.add(newsletterItem);
+
+      logger.info(`Saved newsletter item with ID: ${docRef.id}`);
+
+      // Add to RSS feed as well
+      const feedItemsRef = db.collection(FEED_ITEMS_COLLECTION);
+      await feedItemsRef.add({
+        url: `https://smartfeed-f3b51.web.app/newsletter/${docRef.id}`, // Link to newsletter page
+        title: newsletterItem.title,
+        description: newsletterItem.textContent.substring(0, 500) + (newsletterItem.textContent.length > 500 ? '...' : ''),
+        pubDate: Timestamp.now(),
+      });
+
+      // Regenerate RSS feed
+      const feedItemsQuery = await feedItemsRef
+        .orderBy("pubDate", "desc")
+        .limit(100)
+        .get();
+
+      const feedItems: FeedItem[] = feedItemsQuery.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as FeedItem[];
+
+      // Generate RSS XML
+      const bucket = storage.bucket();
+      const feedFile = bucket.file("feed.xml");
+      const feedUrl = `https://storage.googleapis.com/${bucket.name}/feed.xml`;
+      
+      const rssGenerator = new RSSGenerator();
+      const rssXml = rssGenerator.generateRSSXML(feedItems, feedUrl);
+
+      // Upload to Cloud Storage
+      await feedFile.save(rssXml, {
+        metadata: {
+          contentType: "application/rss+xml",
+          cacheControl: "private",
+        },
+        public: true,
+      });
+
+      logger.info("Newsletter processed and RSS feed updated successfully", {
+        newsletterId: docRef.id,
+        feedUrl,
+        itemCount: feedItems.length,
+      });
+
+      // Return success response
+      const response = {
+        success: true,
+        message: "Newsletter processed successfully",
+        newsletterId: docRef.id,
+        feedUrl,
+      };
+
+      res.status(200).json(response);
+
+    } catch (error) {
+      logger.error("Error processing Parseur webhook", {error});
+      
+      const response = {
+        success: false,
+        message: `Internal server error: ${error}`,
+      };
+      
+      res.status(500).json(response);
+    }
+  }
+);
+/**
+ * API endpoint to get all newsletters
+ */
+export const getNewsletters = onRequest(
+  {
+    cors: true,
+    memory: "256MiB",
+    timeoutSeconds: 60,
+  },
+  async (req, res) => {
+    try {
+      // Only allow GET requests
+      if (req.method !== "GET") {
+        res.status(405).json({success: false, message: "Method not allowed"});
+        return;
+      }
+
+      logger.info("Fetching newsletters");
+
+      // Get newsletters from Firestore
+      const newslettersSnapshot = await db
+        .collection(NEWSLETTER_ITEMS_COLLECTION)
+        .orderBy("pubDate", "desc")
+        .limit(50)
+        .get();
+
+      const newsletters = newslettersSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      logger.info(`Found ${newsletters.length} newsletters`);
+
+      res.status(200).json(newsletters);
+
+    } catch (error) {
+      logger.error("Error fetching newsletters", {error});
+      res.status(500).json({
+        success: false,
+        message: `Internal server error: ${error}`,
+      });
+    }
+  }
+);
+
+/**
+ * API endpoint to get a specific newsletter by ID
+ */
+export const getNewsletter = onRequest(
+  {
+    cors: true,
+    memory: "256MiB",
+    timeoutSeconds: 60,
+  },
+  async (req, res) => {
+    try {
+      // Only allow GET requests
+      if (req.method !== "GET") {
+        res.status(405).json({success: false, message: "Method not allowed"});
+        return;
+      }
+
+      // Get newsletter ID from URL path
+      const newsletterId = req.path.split('/').pop();
+      
+      if (!newsletterId) {
+        res.status(400).json({
+          success: false,
+          message: "Newsletter ID is required",
+        });
+        return;
+      }
+
+      logger.info(`Fetching newsletter: ${newsletterId}`);
+
+      // Get newsletter from Firestore
+      const newsletterDoc = await db
+        .collection(NEWSLETTER_ITEMS_COLLECTION)
+        .doc(newsletterId)
+        .get();
+
+      if (!newsletterDoc.exists) {
+        res.status(404).json({
+          success: false,
+          message: "Newsletter not found",
+        });
+        return;
+      }
+
+      const newsletter = {
+        id: newsletterDoc.id,
+        ...newsletterDoc.data(),
+      } as NewsletterItem;
+
+      logger.info(`Found newsletter: ${newsletter.title || 'Untitled'}`);
+
+      res.status(200).json(newsletter);
+
+    } catch (error) {
+      logger.error("Error fetching newsletter", {error});
+      res.status(500).json({
+        success: false,
+        message: `Internal server error: ${error}`,
+      });
     }
   }
 );

@@ -11,5 +11,6 @@ if (!getApps().length) {
 export const db = getFirestore();
 export const storage = getStorage();
 
-// Collection reference
+// Collection references
 export const FEED_ITEMS_COLLECTION = "feed_items";
+export const NEWSLETTER_ITEMS_COLLECTION = "newsletter_items";

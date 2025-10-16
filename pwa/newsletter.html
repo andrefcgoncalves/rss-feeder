@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsletter - SmartFeed</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4285f4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="SmartFeed">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" href="/icons/icon-152.png">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+            color: white;
+            padding: 20px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 0 0 12px 12px;
+        }
+        
+        .back-button {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 15px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .back-button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .newsletter-meta {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4285f4;
+        }
+        
+        .newsletter-title {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .newsletter-from {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .newsletter-date {
+            color: #888;
+            font-size: 0.8rem;
+        }
+        
+        .newsletter-content {
+            line-height: 1.8;
+            font-size: 16px;
+        }
+        
+        .newsletter-content h1,
+        .newsletter-content h2,
+        .newsletter-content h3 {
+            margin: 20px 0 10px 0;
+            color: #333;
+        }
+        
+        .newsletter-content p {
+            margin-bottom: 15px;
+        }
+        
+        .newsletter-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .newsletter-content a {
+            color: #4285f4;
+            text-decoration: none;
+        }
+        
+        .newsletter-content a:hover {
+            text-decoration: underline;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header {
+                margin: -15px -15px 15px -15px;
+                padding: 15px;
+            }
+            
+            .newsletter-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/newsletters.html" class="back-button">← Back to Newsletters</a>
+            <h1 id="newsletterTitle">Loading...</h1>
+        </div>
+        
+        <div id="loadingMessage" class="loading">
+            <p>Loading newsletter...</p>
+        </div>
+        
+        <div id="errorMessage" class="error" style="display: none;">
+            <p id="errorText"></p>
+        </div>
+        
+        <div id="newsletterContent" style="display: none;">
+            <div class="newsletter-meta">
+                <div class="newsletter-from" id="newsletterFrom"></div>
+                <div class="newsletter-date" id="newsletterDate"></div>
+            </div>
+            
+            <div class="newsletter-content" id="newsletterBody"></div>
+        </div>
+        
+        <div class="footer">
+            <p>Powered by SmartFeed</p>
+        </div>
+    </div>
+    
+    <script>
+        // Get newsletter ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const newsletterId = urlParams.get('id');
+        
+        if (!newsletterId) {
+            showError('Newsletter ID not provided');
+            return;
+        }
+        
+        // Load newsletter data
+        loadNewsletter(newsletterId);
+        
+        async function loadNewsletter(id) {
+            try {
+                const response = await fetch(`/api/newsletter/${id}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to load newsletter: ${response.status}`);
+                }
+                
+                const newsletter = await response.json();
+                displayNewsletter(newsletter);
+                
+            } catch (error) {
+                console.error('Error loading newsletter:', error);
+                showError('Failed to load newsletter. Please try again.');
+            }
+        }
+        
+        function displayNewsletter(newsletter) {
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('newsletterContent').style.display = 'block';
+            
+            // Set title
+            document.getElementById('newsletterTitle').textContent = newsletter.title;
+            document.title = `${newsletter.title} - SmartFeed`;
+            
+            // Set metadata
+            document.getElementById('newsletterFrom').textContent = `From: ${newsletter.from}`;
+            document.getElementById('newsletterDate').textContent = `Received: ${new Date(newsletter.pubDate.seconds * 1000).toLocaleString()}`;
+            
+            // Set content
+            document.getElementById('newsletterBody').innerHTML = newsletter.content;
+        }
+        
+        function showError(message) {
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'block';
+            document.getElementById('errorText').textContent = message;
+        }
+    </script>
+</body>
+</html>

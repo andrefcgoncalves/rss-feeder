@@ -1,6 +1,4 @@
-const {defineConfig} = require("@jest/globals");
-
-module.exports = defineConfig({
+module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
@@ -15,4 +13,4 @@ module.exports = defineConfig({
   ],
   coverageDirectory: "coverage",
   coverageReporters: ["text", "lcov", "html"],
-});
+};
