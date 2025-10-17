@@ -61,16 +61,10 @@ export interface NewsletterItem {
   title: string;
   /** Newsletter content (HTML) */
   content: string;
-  /** Plain text version of content */
-  textContent: string;
   /** Newsletter sender/from email */
   from: string;
-  /** Newsletter subject */
-  subject: string;
   /** Date the newsletter was received */
   pubDate: Timestamp;
-  /** Parseur webhook data */
-  parseurData?: any;
 }
 
 /**

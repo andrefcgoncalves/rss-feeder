@@ -28,10 +28,6 @@
         "destination": "/share-target.html"
       },
       {
-        "source": "/api/newsletters",
-        "function": "getNewsletters"
-      },
-      {
         "source": "/api/newsletter/**",
         "function": "getNewsletter"
       },

@@ -5,5 +5,8 @@ service cloud.firestore {
     match /feed_items/{document} {
       allow read, write: if false;
     }
+    match /newsletter_items/{document} {
+      allow read, write: if false;
+    }
   }
 }

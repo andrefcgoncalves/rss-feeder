@@ -19,7 +19,7 @@ function validateAuth(request: Request): boolean {
   // Check if this is a request from our own PWA (via Firebase Hosting rewrite)
   const referer = request.get("Referer");
   const userAgent = request.get("User-Agent");
-  
+
   // Allow requests from our own domain (PWA share target)
   if (referer && (referer.includes(".web.app") || referer.includes(".firebaseapp.com"))) {
     return true;
@@ -27,11 +27,12 @@ function validateAuth(request: Request): boolean {
 
   // For external requests, require API token
   const authHeader = request.get("Authorization");
+  const xApiKey = request.get("x-api-key");
   const bodyToken = request.body?.token;
   const expectedToken = apiToken.value();
 
   // Check Authorization header (Bearer token) or token in body
-  const providedToken = authHeader?.replace("Bearer ", "") || bodyToken;
+  const providedToken = authHeader?.replace("Bearer ", "") || xApiKey || bodyToken;
   
   return providedToken === expectedToken;
 }
@@ -181,28 +182,6 @@ export const ingestUrl = onRequest(
 );
 
 /**
- * Validates authentication for regenerate RSS endpoint (no URL required)
- */
-function validateRegenerateAuth(request: Request): boolean {
-  // Check if this is a request from our own PWA (via Firebase Hosting rewrite)
-  const referer = request.get("Referer");
-  
-  // Allow requests from our own domain (PWA share target)
-  if (referer && (referer.includes(".web.app") || referer.includes(".firebaseapp.com"))) {
-    return true;
-  }
-
-  // For external requests, require API token
-  const authHeader = request.get("Authorization");
-  const expectedToken = apiToken.value();
-
-  // Check Authorization header (Bearer token)
-  const providedToken = authHeader?.replace("Bearer ", "");
-  
-  return providedToken === expectedToken;
-}
-
-/**
  * Regenerate RSS feed from existing Firestore data
  */
 export const regenerateRSS = onRequest(
@@ -220,7 +199,7 @@ export const regenerateRSS = onRequest(
     }
 
     // Validate authentication (no URL validation needed)
-    if (!validateRegenerateAuth(req)) {
+    if (!validateAuth(req)) {
       res.status(401).json({success: false, message: "Unauthorized"});
       return;
     }
@@ -326,6 +305,12 @@ export const parseurWebhook = onRequest(
         return;
       }
 
+      // Validate authentication (no URL validation needed)
+      if (!validateAuth(req)) {
+        res.status(401).json({ success: false, message: "Unauthorized" });
+        return;
+      }
+
       // Parse request body
       const webhookData: ParseurWebhookRequest = req.body;
       
@@ -334,7 +319,7 @@ export const parseurWebhook = onRequest(
       if (!newsletterParser.validateWebhookData(webhookData)) {
         res.status(400).json({
           success: false,
-          message: "Invalid webhook data. Missing required fields: subject, html/text, from",
+          message: "Invalid webhook data. Missing required fields: subject, htmlDocument",
         });
         return;
       }
@@ -343,7 +328,7 @@ export const parseurWebhook = onRequest(
 
       // Parse newsletter content
       const newsletterItem = newsletterParser.parseNewsletter(webhookData);
-      
+
       // Save to Firestore
       const newsletterItemsRef = db.collection(NEWSLETTER_ITEMS_COLLECTION);
       const docRef = await newsletterItemsRef.add(newsletterItem);
@@ -355,7 +340,8 @@ export const parseurWebhook = onRequest(
       await feedItemsRef.add({
         url: `https://smartfeed-f3b51.web.app/newsletter/${docRef.id}`, // Link to newsletter page
         title: newsletterItem.title,
-        description: newsletterItem.textContent.substring(0, 500) + (newsletterItem.textContent.length > 500 ? '...' : ''),
+        description: 'Newsletter parsed from email',
+        // description: newsletterItem.textContent.substring(0, 500) + (newsletterItem.textContent.length > 500 ? '...' : ''),
         pubDate: Timestamp.now(),
       });
 
@@ -412,50 +398,6 @@ export const parseurWebhook = onRequest(
       };
       
       res.status(500).json(response);
-    }
-  }
-);
-/**
- * API endpoint to get all newsletters
- */
-export const getNewsletters = onRequest(
-  {
-    cors: true,
-    memory: "256MiB",
-    timeoutSeconds: 60,
-  },
-  async (req, res) => {
-    try {
-      // Only allow GET requests
-      if (req.method !== "GET") {
-        res.status(405).json({success: false, message: "Method not allowed"});
-        return;
-      }
-
-      logger.info("Fetching newsletters");
-
-      // Get newsletters from Firestore
-      const newslettersSnapshot = await db
-        .collection(NEWSLETTER_ITEMS_COLLECTION)
-        .orderBy("pubDate", "desc")
-        .limit(50)
-        .get();
-
-      const newsletters = newslettersSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      logger.info(`Found ${newsletters.length} newsletters`);
-
-      res.status(200).json(newsletters);
-
-    } catch (error) {
-      logger.error("Error fetching newsletters", {error});
-      res.status(500).json({
-        success: false,
-        message: `Internal server error: ${error}`,
-      });
     }
   }
 );

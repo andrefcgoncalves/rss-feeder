@@ -45,9 +45,7 @@ describe('NewsletterParser', () => {
 
       expect(result.title).toBe('Weekly Tech News');
       expect(result.from).toBe('newsletter@tech.com');
-      expect(result.subject).toBe('Weekly Tech News');
       expect(result.content).toContain('Tech News');
-      expect(result.textContent).toContain('This is the content');
     });
 
     it('should clean HTML content', () => {

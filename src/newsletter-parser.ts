@@ -20,26 +20,17 @@ export class NewsletterParser {
         from: webhookData.from
       });
 
-      // Extract title from subject or use provided title
-      const title = this.extractTitle(webhookData.subject, webhookData.title);
-      
       // Clean and process HTML content
-      const cleanedHtml = this.cleanHtmlContent(webhookData.html);
-      
-      // Extract plain text content
-      const textContent = this.extractTextContent(webhookData.text || webhookData.html);
-      
+      const cleanedHtml = this.cleanHtmlContent(webhookData.htmlDocument);
+
       // Extract main content from HTML (remove headers, footers, etc.)
-      const mainContent = this.extractMainContent(cleanedHtml);
+      // const mainContent = this.extractMainContent(cleanedHtml);
 
       const newsletterItem: Omit<NewsletterItem, 'id'> = {
-        title,
-        content: mainContent,
-        textContent,
-        from: webhookData.from,
-        subject: webhookData.subject,
+        title: webhookData.subject,
+        content: cleanedHtml,
         pubDate: Timestamp.now(),
-        parseurData: webhookData
+        from: webhookData.fromNameOriginal?.full || '',
       };
 
       logger.info('Newsletter parsed successfully', {
@@ -55,34 +46,6 @@ export class NewsletterParser {
     }
   }
 
-  /**
-   * Extract title from subject line or use provided title
-   */
-  private extractTitle(subject: string, providedTitle?: string): string {
-    if (providedTitle && providedTitle.trim()) {
-      return providedTitle.trim();
-    }
-
-    // Clean up subject line
-    let title = subject.trim();
-    
-    // Remove common newsletter prefixes
-    const prefixes = [
-      /^\[.*?\]\s*/g,  // [Newsletter Name]
-      /^Newsletter:\s*/gi,
-      /^Weekly\s+/gi,
-      /^Daily\s+/gi,
-      /^Monthly\s+/gi,
-      /^Update:\s*/gi,
-      /^Alert:\s*/gi
-    ];
-
-    prefixes.forEach(prefix => {
-      title = title.replace(prefix, '');
-    });
-
-    return title || 'Newsletter';
-  }
 
   /**
    * Clean HTML content by removing unwanted elements
@@ -134,7 +97,7 @@ export class NewsletterParser {
     });
 
     // Clean up attributes but keep essential ones
-    $('*').each((_, element) => {
+    $('*').each((_: any, element: any) => {
       const $el = $(element);
       const tagName = (element as any).tagName?.toLowerCase();
       
@@ -158,29 +121,6 @@ export class NewsletterParser {
     });
 
     return $.html();
-  }
-
-  /**
-   * Extract plain text content from HTML
-   */
-  private extractTextContent(html: string): string {
-    if (!html) return '';
-
-    const $ = cheerio.load(html);
-    
-    // Remove script and style elements
-    $('script, style').remove();
-    
-    // Get text content and clean it up
-    let text = ($ as any).text() || '';
-    
-    // Clean up whitespace
-    text = text
-      .replace(/\s+/g, ' ')  // Replace multiple whitespace with single space
-      .replace(/\n\s*\n/g, '\n')  // Replace multiple newlines with single newline
-      .trim();
-
-    return text;
   }
 
   /**
@@ -242,8 +182,7 @@ export class NewsletterParser {
       typeof data === 'object' &&
       data !== null &&
       typeof data.subject === 'string' &&
-      (typeof data.html === 'string' || typeof data.text === 'string') &&
-      typeof data.from === 'string'
+      (typeof data.htmlDocument === 'string')
     );
   }
 }
