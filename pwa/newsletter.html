@@ -197,14 +197,14 @@
         // Get newsletter ID from URL
         const urlParams = new URLSearchParams(window.location.search);
         const newsletterId = urlParams.get('id');
-        
+
         if (!newsletterId) {
             showError('Newsletter ID not provided');
-            return;
+        } else {
+            // Load newsletter data
+            loadNewsletter(newsletterId);
         }
-        
-        // Load newsletter data
-        loadNewsletter(newsletterId);
+
         
         async function loadNewsletter(id) {
             try {

@@ -15,22 +15,24 @@ export class NewsletterParser {
    */
   parseNewsletter(webhookData: ParseurWebhookRequest): Omit<NewsletterItem, 'id'> {
     try {
+      const subject = webhookData.Subject.replace(/^(?:Fwd|FWD|Fw|FW):\s*/i, '');
       logger.info('Parsing newsletter from Parseur webhook', {
-        subject: webhookData.subject,
+        subject,
         from: webhookData.from
       });
 
       // Clean and process HTML content
-      const cleanedHtml = this.cleanHtmlContent(webhookData.htmlDocument);
+      const cleanedHtml = this.cleanHtmlContent(webhookData.HtmlDocument);
 
       // Extract main content from HTML (remove headers, footers, etc.)
       // const mainContent = this.extractMainContent(cleanedHtml);
 
       const newsletterItem: Omit<NewsletterItem, 'id'> = {
-        title: webhookData.subject,
+        title: subject,
         content: cleanedHtml,
         pubDate: Timestamp.now(),
         from: webhookData.fromNameOriginal?.full || '',
+        newsletterName: webhookData.newsletterName || 'Unknown',
       };
 
       logger.info('Newsletter parsed successfully', {
@@ -89,7 +91,9 @@ export class NewsletterParser {
       '.promo',
       '.advertisement',
       '.ad',
-      '.sponsor'
+      '.sponsor',
+      '.gmail_signature',
+      '.gmail_attr'
     ];
 
     unwantedClasses.forEach(className => {
@@ -181,8 +185,8 @@ export class NewsletterParser {
     return (
       typeof data === 'object' &&
       data !== null &&
-      typeof data.subject === 'string' &&
-      (typeof data.htmlDocument === 'string')
+      typeof data.Subject === 'string' &&
+      (typeof data.HtmlDocument === 'string')
     );
   }
 }

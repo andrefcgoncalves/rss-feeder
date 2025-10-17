@@ -3,11 +3,12 @@ import {defineSecret} from "firebase-functions/params";
 import {logger} from "firebase-functions";
 import {Timestamp} from "firebase-admin/firestore";
 import {Request} from "firebase-functions/v2/https";
-import {db, storage, FEED_ITEMS_COLLECTION, NEWSLETTER_ITEMS_COLLECTION} from "./firebase";
+import {db, FEED_ITEMS_COLLECTION, NEWSLETTER_ITEMS_COLLECTION} from "./firebase";
 import {GeminiService, geminiApiKey} from "./gemini-service";
 import {RSSGenerator} from "./rss-generator";
+import {RSSService} from "./rss-service";
 import {NewsletterParser} from "./newsletter-parser";
-import {FeedItem, IngestionRequest, IngestionResponse, NewsletterItem, ParseurWebhookRequest} from "./types";
+import {IngestionRequest, IngestionResponse, NewsletterItem, ParseurWebhookRequest} from "./types";
 
 // Define the secret for API access token
 const apiToken = defineSecret("API_TOKEN");
@@ -108,6 +109,7 @@ export const ingestUrl = onRequest(
       // Initialize services
       const geminiService = new GeminiService(geminiApiKey.value());
       const rssGenerator = new RSSGenerator();
+      const rssService = new RSSService(rssGenerator);
 
       // Step 1: Parse URL with Gemini
       const parsedContent = await geminiService.parseUrl(requestBody.url);
@@ -123,38 +125,11 @@ export const ingestUrl = onRequest(
 
       logger.info(`Saved feed item with ID: ${docRef.id}`);
 
-      // Step 3: Generate RSS feed
-      const feedItemsQuery = await feedItemsRef
-        .orderBy("pubDate", "desc")
-        .limit(100)
-        .get();
-
-      const feedItems: FeedItem[] = feedItemsQuery.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as FeedItem[];
-
-      // Step 4: Generate RSS XML
-      const bucket = storage.bucket();
-      const feedFile = bucket.file("feed.xml");
-
-      // Get the public URL for the feed
-      const feedUrl = `https://storage.googleapis.com/${bucket.name}/feed.xml`;
-      
-      const rssXml = rssGenerator.generateRSSXML(feedItems, feedUrl);
-
-      // Step 5: Upload to Cloud Storage
-      await feedFile.save(rssXml, {
-        metadata: {
-          contentType: "application/rss+xml",
-          cacheControl: "private", // Cache for 15 minutes
-        },
-        public: true,
-      });
+      // Update RSS feed using service
+      const {itemCount} = await rssService.rebuildAndUpload();
 
       logger.info("RSS feed updated successfully", {
-        feedUrl,
-        itemCount: feedItems.length,
+        itemCount,
         newItemId: docRef.id,
       });
 
@@ -162,7 +137,6 @@ export const ingestUrl = onRequest(
       const response: IngestionResponse = {
         success: true,
         message: "URL processed and feed updated successfully",
-        feedUrl,
         itemId: docRef.id,
       };
 
@@ -180,6 +154,57 @@ export const ingestUrl = onRequest(
     }
   }
 );
+
+/**
+ * Serve RSS feed from Cloud Storage
+ */
+// export const serveRSS = onRequest(
+//   {
+//     cors: true,
+//     memory: "256MiB",
+//     timeoutSeconds: 60,
+//   },
+//   async (req, res) => {
+//     try {
+//       logger.info("RSS feed requested");
+
+//       // Get the RSS feed from Cloud Storage
+//       const bucket = storage.bucket();
+//       const feedFile = bucket.file("feed.xml");
+      
+//       // Check if the feed exists
+//       const [exists] = await feedFile.exists();
+//       if (!exists) {
+//         logger.warn("RSS feed not found in Cloud Storage");
+//         res.status(404).json({
+//           success: false,
+//           message: "RSS feed not found"
+//         });
+//         return;
+//       }
+
+//       // Download the RSS feed from Cloud Storage
+//       const [rssXml] = await feedFile.download();
+//       const rssContent = rssXml.toString('utf-8');
+
+//       logger.info("Serving RSS feed from Cloud Storage");
+
+//       // Set proper headers for RSS feed
+//       res.set('Content-Type', 'application/rss+xml; charset=utf-8');
+//       res.set('Cache-Control', 'private');
+//       // res.set('Cache-Control', 'public, max-age=900'); // Cache for 15 minutes
+      
+//       res.status(200).send(rssContent);
+
+//     } catch (error) {
+//       logger.error("Error serving RSS feed", {error});
+//       res.status(500).json({
+//         success: false,
+//         message: `Internal server error: ${error}`,
+//       });
+//     }
+//   }
+// );
 
 /**
  * Regenerate RSS feed from existing Firestore data
@@ -207,60 +232,17 @@ export const regenerateRSS = onRequest(
     try {
       logger.info("Starting RSS regeneration from existing data");
 
-      // Step 1: Get all feed items from Firestore
-      const feedItemsSnapshot = await db
-        .collection(FEED_ITEMS_COLLECTION)
-        .orderBy("pubDate", "desc")
-        .limit(25)
-        .get();
-
-      if (feedItemsSnapshot.empty) {
-        logger.warn("No feed items found in Firestore");
-        res.status(404).json({
-          success: false,
-          message: "No feed items found to regenerate RSS"
-        });
-        return;
-      }
-
-      const feedItems: FeedItem[] = feedItemsSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        url: doc.data().url,
-        title: doc.data().title,
-        description: doc.data().description,
-        pubDate: doc.data().pubDate,
-      }));
-
-      logger.info(`Found ${feedItems.length} feed items to regenerate RSS`);
-
-      // Step 2: Get Cloud Storage bucket and file reference
-      const bucket = storage.bucket();
-      const feedFile = bucket.file("feed.xml");
-
-      // Step 3: Generate RSS XML
-      const feedUrl = `https://storage.googleapis.com/${bucket.name}/feed.xml`;
-      const rssGenerator = new RSSGenerator();
-      const rssXml = rssGenerator.generateRSSXML(feedItems, feedUrl);
-
-      // Step 4: Upload to Cloud Storage
-      await feedFile.save(rssXml, {
-        metadata: {
-          contentType: "application/rss+xml",
-          cacheControl: "private", // Cache for 15 minutes
-        },
-        public: true,
-      });
+      const rssService = new RSSService(new RSSGenerator());
+      const {itemCount} = await rssService.rebuildAndUpload();
 
       logger.info("RSS feed regenerated successfully", {
-        feedUrl,
-        itemCount: feedItems.length,
+        itemCount,
       });
 
       // Return success response
       const response: IngestionResponse = {
         success: true,
-        message: `RSS feed regenerated successfully with ${feedItems.length} items`,
-        feedUrl,
+        message: `RSS feed regenerated successfully with ${itemCount} items`,
       };
 
       res.status(200).json(response);
@@ -338,45 +320,19 @@ export const parseurWebhook = onRequest(
       // Add to RSS feed as well
       const feedItemsRef = db.collection(FEED_ITEMS_COLLECTION);
       await feedItemsRef.add({
-        url: `https://smartfeed-f3b51.web.app/newsletter/${docRef.id}`, // Link to newsletter page
+        url: `https://smartfeed-f3b51.web.app/newsletter?id=${docRef.id}`, // Link to newsletter page
         title: newsletterItem.title,
-        description: 'Newsletter parsed from email',
-        // description: newsletterItem.textContent.substring(0, 500) + (newsletterItem.textContent.length > 500 ? '...' : ''),
+        description: `By ${newsletterItem.newsletterName}`,
         pubDate: Timestamp.now(),
       });
 
-      // Regenerate RSS feed
-      const feedItemsQuery = await feedItemsRef
-        .orderBy("pubDate", "desc")
-        .limit(100)
-        .get();
-
-      const feedItems: FeedItem[] = feedItemsQuery.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as FeedItem[];
-
-      // Generate RSS XML
-      const bucket = storage.bucket();
-      const feedFile = bucket.file("feed.xml");
-      const feedUrl = `https://storage.googleapis.com/${bucket.name}/feed.xml`;
-      
-      const rssGenerator = new RSSGenerator();
-      const rssXml = rssGenerator.generateRSSXML(feedItems, feedUrl);
-
-      // Upload to Cloud Storage
-      await feedFile.save(rssXml, {
-        metadata: {
-          contentType: "application/rss+xml",
-          cacheControl: "private",
-        },
-        public: true,
-      });
+      // Regenerate RSS feed using service (public read for newsletter path)
+      const rssService = new RSSService(new RSSGenerator());
+      const {itemCount} = await rssService.rebuildAndUpload();
 
       logger.info("Newsletter processed and RSS feed updated successfully", {
         newsletterId: docRef.id,
-        feedUrl,
-        itemCount: feedItems.length,
+        itemCount,
       });
 
       // Return success response
@@ -384,7 +340,6 @@ export const parseurWebhook = onRequest(
         success: true,
         message: "Newsletter processed successfully",
         newsletterId: docRef.id,
-        feedUrl,
       };
 
       res.status(200).json(response);

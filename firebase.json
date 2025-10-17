@@ -28,6 +28,10 @@
         "destination": "/share-target.html"
       },
       {
+        "source": "/newsletter",
+        "destination": "/newsletter.html"
+      },
+      {
         "source": "/api/newsletter/**",
         "function": "getNewsletter"
       },

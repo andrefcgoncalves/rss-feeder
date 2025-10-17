@@ -65,6 +65,8 @@ export interface NewsletterItem {
   from: string;
   /** Date the newsletter was received */
   pubDate: Timestamp;
+  /** Newsletter Name */
+  newsletterName: string;
 }
 
 /**
