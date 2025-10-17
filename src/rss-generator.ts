@@ -17,17 +17,17 @@ export class RSSGenerator {
       description: "AI-powered RSS feed generated using Gemini API",
       feed_url: "", // Will be set dynamically
       site_url: this.baseUrl, // Will be set dynamically
-      managingEditor: process.env.RSS_MANAGING_EDITOR || "andrefcgoncalves@gmail.com",
-      webMaster: process.env.RSS_WEBMASTER || "andrefcgoncalves@gmail.com",
+      managingEditor: 'andrefcgoncalves@gmail.com (André Gonçalves)',
+      webMaster: 'andrefcgoncalves@gmail.com (André Gonçalves)',
       copyright: `${new Date().getFullYear()} SmartFeed`,
       language: "en",
       categories: ["Technology", "AI", "RSS"],
       pubDate: new Date(),
       ttl: 15, // Cache for 15 minutes
-      image_url: `${this.baseUrl}favicon.ico`,
-      custom_namespaces: {
-        'atom': 'http://www.w3.org/2005/Atom'
-      }
+      // image_url: `${this.baseUrl}favicon.ico`,
+      // custom_namespaces: {
+      //   'atom': 'http://www.w3.org/2005/Atom'
+      // }
     };
   }
 
@@ -60,7 +60,7 @@ export class RSSGenerator {
 
       const xmlString = feed.xml({indent: true});
       logger.info("RSS XML generated successfully");
-      
+
       return xmlString;
 
     } catch (error) {
