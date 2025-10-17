@@ -233,7 +233,7 @@
             
             // Set metadata
             document.getElementById('newsletterFrom').textContent = `From: ${newsletter.from}`;
-            document.getElementById('newsletterDate').textContent = `Received: ${new Date(newsletter.pubDate.seconds * 1000).toLocaleString()}`;
+            document.getElementById('newsletterDate').textContent = `Received: ${new Date(newsletter.pubDate).toLocaleString()}`;
             
             // Set content
             document.getElementById('newsletterBody').innerHTML = newsletter.content;

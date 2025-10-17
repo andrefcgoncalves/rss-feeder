@@ -404,8 +404,9 @@ export const getNewsletter = onRequest(
       const newsletter = {
         id: newsletterDoc.id,
         ...newsletterDoc.data(),
-      } as NewsletterItem;
+      } as Omit<NewsletterItem, 'pubDate'>;
 
+      (newsletter as any).pubDate = newsletterDoc.data()?.pubDate?.toDate() || new Date();
       logger.info(`Found newsletter: ${newsletter.title || 'Untitled'}`);
 
       res.status(200).json(newsletter);
