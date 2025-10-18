@@ -24,7 +24,7 @@ export class RSSGenerator {
       categories: ["Technology", "AI", "RSS"],
       pubDate: new Date(),
       ttl: 15, // Cache for 15 minutes
-      image_url: `${this.baseUrl}favicon.ico`,
+      // image_url: `${this.baseUrl}favicon.ico`,
       // custom_namespaces: {
       //   'atom': 'http://www.w3.org/2005/Atom'
       // }
