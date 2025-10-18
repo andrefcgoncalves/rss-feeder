@@ -40,19 +40,19 @@ export class RSSService {
    */
   generateXml(items: FeedItem[]): string {
     const bucket = storage.bucket();
-    const feedUrl = `https://storage.googleapis.com/${bucket.name}/feed.xml`;
+    const feedUrl = `https://storage.googleapis.com/${bucket.name}/rss-feed.xml`;
     // const feedUrl = "https://smartfeed-f3b51.web.app/feed.xml";
 
     return this.rssGenerator.generateRSSXML(items, feedUrl);
   }
 
   /**
-   * Upload XML content to Cloud Storage at path "feed.xml"
+   * Upload XML content to Cloud Storage at path "rss-feed.xml"
    * @param xml RSS XML
    */
   async uploadXml(xml: string): Promise<{bucketName: string; filePath: string}> {
     const bucket = storage.bucket();
-    const file = bucket.file("feed.xml");
+    const file = bucket.file("rss-feed.xml");
 
     await file.save(xml, {
       metadata: {
@@ -62,8 +62,8 @@ export class RSSService {
       public: true,
     });
 
-    logger.info("RSS XML uploaded to Cloud Storage", {bucket: bucket.name, path: "feed.xml"});
-    return {bucketName: bucket.name, filePath: "feed.xml"};
+    logger.info("RSS XML uploaded to Cloud Storage", {bucket: bucket.name, path: "rss-feed.xml"});
+    return {bucketName: bucket.name, filePath: "rss-feed.xml"};
   }
 
   /**

@@ -170,7 +170,7 @@ export const ingestUrl = onRequest(
 
 //       // Get the RSS feed from Cloud Storage
 //       const bucket = storage.bucket();
-//       const feedFile = bucket.file("feed.xml");
+//       const feedFile = bucket.file("rss-feed.xml");
       
 //       // Check if the feed exists
 //       const [exists] = await feedFile.exists();

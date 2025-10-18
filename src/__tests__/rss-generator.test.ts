@@ -28,7 +28,7 @@ describe("RSSGenerator", () => {
         },
       ];
 
-      const feedUrl = "https://storage.googleapis.com/test-bucket/feed.xml";
+      const feedUrl = "https://storage.googleapis.com/test-bucket/rss-feed.xml";
       const rssXml = rssGenerator.generateRSSXML(feedItems, feedUrl);
 
       // Basic XML structure validation
@@ -40,7 +40,7 @@ describe("RSSGenerator", () => {
 
       // Feed metadata validation
       expect(rssXml).toContain("<title>Gemini RSS Feed</title>");
-      expect(rssXml).toContain("<link>" + feedUrl.replace("/feed.xml", "") + "</link>");
+      expect(rssXml).toContain("<link>" + feedUrl.replace("/rss-feed.xml", "") + "</link>");
 
       // Items validation
       expect(rssXml).toContain("<title>Test Article 1</title>");
@@ -53,7 +53,7 @@ describe("RSSGenerator", () => {
 
     it("should handle empty feed items array", () => {
       const feedItems: FeedItem[] = [];
-      const feedUrl = "https://storage.googleapis.com/test-bucket/feed.xml";
+      const feedUrl = "https://storage.googleapis.com/test-bucket/rss-feed.xml";
       
       const rssXml = rssGenerator.generateRSSXML(feedItems, feedUrl);
 
@@ -73,7 +73,7 @@ describe("RSSGenerator", () => {
         },
       ];
 
-      const feedUrl = "https://storage.googleapis.com/test-bucket/feed.xml";
+      const feedUrl = "https://storage.googleapis.com/test-bucket/rss-feed.xml";
       const rssXml = rssGenerator.generateRSSXML(feedItems, feedUrl);
 
       expect(rssXml).toContain("<guid>unique-guid-123</guid>");

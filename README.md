@@ -96,7 +96,7 @@ curl -X POST https://your-region-your-project.cloudfunctions.net/ingestUrl \
 
 The RSS feed is available at:
 ```
-https://storage.googleapis.com/your-project.appspot.com/feed.xml
+https://storage.googleapis.com/your-project.appspot.com/rss-feed.xml
 ```
 
 ## API Reference
@@ -121,7 +121,7 @@ Processes a URL and adds it to the RSS feed.
 {
   "success": true,
   "message": "URL processed and feed updated successfully",
-  "feedUrl": "https://storage.googleapis.com/project.appspot.com/feed.xml",
+  "feedUrl": "https://storage.googleapis.com/project.appspot.com/rss-feed.xml",
   "itemId": "generated-document-id"
 }
 ```
@@ -134,7 +134,7 @@ The RSS feed can be customized by modifying the `RSSGenerator` configuration in 
 
 - API endpoint requires authentication via Bearer token
 - Firestore rules restrict direct database access
-- Storage rules allow public read access only to feed.xml
+- Storage rules allow public read access only to rss-feed.xml
 - Secrets are managed via Firebase Secret Manager
 
 ## Development

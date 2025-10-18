@@ -6,6 +6,11 @@ service firebase.storage {
       allow read: if true;
       allow write: if false;
     }
+
+    match /rss-feed.xml {
+      allow read: if true;
+      allow write: if false;
+    }
     
     // Deny access to all other files
     match /{allPaths=**} {

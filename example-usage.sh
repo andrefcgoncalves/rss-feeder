@@ -5,7 +5,7 @@
 # Configuration
 FUNCTION_URL="https://YOUR-REGION-YOUR-PROJECT.cloudfunctions.net/ingestUrl"
 API_TOKEN="your-secure-api-token-here"
-RSS_FEED_URL="https://storage.googleapis.com/YOUR-PROJECT.appspot.com/feed.xml"
+RSS_FEED_URL="https://storage.googleapis.com/YOUR-PROJECT.appspot.com/rss-feed.xml"
 
 echo "📰 Gemini RSS Generator - Example Usage"
 echo "======================================"

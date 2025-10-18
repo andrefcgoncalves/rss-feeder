@@ -101,7 +101,7 @@ firebase deploy --only hosting
 | Unauthorized access | 401/403 response |
 
 #### RSS Feed Validation
-1. Access feed URL: `https://storage.googleapis.com/PROJECT.appspot.com/feed.xml`
+1. Access feed URL: `https://storage.googleapis.com/PROJECT.appspot.com/rss-feed.xml`
 2. Verify XML structure is valid RSS 2.0
 3. Check items are sorted by date (newest first)
 4. Confirm GUID uniqueness
