@@ -26,6 +26,18 @@
       {
         "source": "/share-target",
         "destination": "/share-target.html"
+      },
+      {
+        "source": "/newsletter",
+        "destination": "/newsletter.html"
+      },
+      {
+        "source": "/api/newsletter/**",
+        "function": "getNewsletter"
+      },
+      {
+        "source": "/parseur-webhook",
+        "function": "parseurWebhook"
       }
     ],
     "headers": [

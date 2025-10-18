@@ -78,7 +78,7 @@ if [ $? -eq 0 ]; then
     echo "3. Share content from any app → select 'RSS Share'"
     echo ""
     echo "🌐 RSS Feed:"
-    echo "   https://storage.googleapis.com/YOUR-PROJECT.appspot.com/feed.xml"
+    echo "   https://storage.googleapis.com/YOUR-PROJECT.appspot.com/rss-feed.xml"
     echo ""
     echo "📖 For detailed usage instructions, see README.md"
 else
