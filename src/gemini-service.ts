@@ -6,6 +6,7 @@ import {GeminiParseResponse} from "./types";
 // Define the secret for Gemini API key
 export const geminiApiKey = defineSecret("GEMINI_API_KEY");
 
+const GEMINI_ACTIVE = false;
 /**
  * Service class for interacting with the Gemini API
  */
@@ -26,6 +27,13 @@ export class GeminiService {
    * @returns Promise with parsed title and description
    */
   async parseUrl(url: string): Promise<GeminiParseResponse> {
+    if (!GEMINI_ACTIVE) {
+      return {
+        title: this.generateFallbackTitle(url),
+        description: `Content from ${new URL(url).hostname}`,
+      };
+    }
+
     try {
       logger.info(`Parsing URL with Gemini: ${url}`);
 
