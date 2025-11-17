@@ -30,7 +30,7 @@ export class GeminiService {
     if (!GEMINI_ACTIVE) {
       return {
         title: this.generateFallbackTitle(url),
-        description: `Content from ${new URL(url).hostname}`,
+        description: new URL(url).hostname.replace("www.", ""),
       };
     }
 
@@ -117,9 +117,9 @@ URL to analyze: ${url}
         const segments = pathname.split("/");
         const lastSegment = segments[segments.length - 1];
         const title = lastSegment.replace(/[-_]/g, " ").replace(/\.[^.]*$/, "");
-        return `${title.charAt(0).toUpperCase() + title.slice(1)} - ${hostname}`;
+        return `${title.charAt(0).toUpperCase() + title.slice(1)}`;
       }
-      
+
       return `Content from ${hostname}`;
     } catch {
       return "RSS Feed Item";
